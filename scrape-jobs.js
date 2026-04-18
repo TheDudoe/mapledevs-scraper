@@ -273,18 +273,24 @@ const CANADA_KEYWORDS = [
  *   "Toronto; Vancouver" -> "Toronto, ON" (picks first)
  *   "Bellevue, WA" -> null (filtered out)
  */
-function normalizeLocation(raw, studioCity = '') {
+/**
+ * Normalizes messy locations into "City, Prov" format.
+ */
+function normalizeLocation(raw, studioCity = '', filter = null) {
   if (!raw || raw.toLowerCase().includes('blank')) return studioCity || 'Canada';
+
+  const sLowerRaw = raw.toLowerCase();
+  
+  // High-Confidence Blocklist: Major tech hubs & US States
+  const isForeignRegex = /france|paris|germany|berlin|usa|united states|united kingdom|uk\b|england|india|bangalore|japan|tokyo|spain|madrid|barcelona|brazil|mexico|australia|austin|seattle|california|texas|florida|\bTX\b|\bWA\b|\bNY\b|\bFL\b|\bIL\b|\bMA\b|\bGA\b|\bNC\b/i;
+  
+  // Canada check: Must have province or explicit "Canada" or be a known city
+  const isCanadaRegex = /canada|, ca\b|, on\b|, qc\b|, bc\b|, ab\b|, sk\b|, mb\b|, ns\b|, nb\b|, pe\b|, nl\b|ontario|quebec|british columbia|alberta|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland/i;
+  const hasCanadaKeyword = CANADA_KEYWORDS.some(k => sLowerRaw.includes(k));
 
   // 1. Parse all possible locations (some ATS list multiple)
   const segments = raw.split(/[;/]/).map(s => s.trim());
   
-  // High-Confidence Blocklist: Major tech hubs & US States (No USA roles!)
-  // Added \b to state codes to be precise. 
-  const isForeignRegex = /france|paris|germany|berlin|usa|united states|united kingdom|london\s*uk|london,\s*england|india|japan|spain|brazil|mexico|australia|austin|seattle|california|texas|florida|\bTX\b|\bWA\b|\bNY\b|\bFL\b|\bIL\b|\bMA\b|\bGA\b|\bNC\b/i;
-  // Canada check: Must have province or explicit "Canada"
-  const isCanadaRegex = /canada|, ca\b|, on\b|, qc\b|, bc\b|, ab\b|, sk\b|, mb\b|, ns\b|, nb\b|, pe\b|, nl\b|ontario|quebec|british columbia|alberta|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland/i;
-
   // 2. Filter for the BEST location
   let bestLoc = null;
 
@@ -304,7 +310,20 @@ function normalizeLocation(raw, studioCity = '') {
     if (isRemote && !bestLoc) bestLoc = seg;
   }
 
-  if (!bestLoc) return null; // No Canadian or clear Remote match found
+  // CRITICAL FIREWALL: If the studio has a filter (like "Canada"), 
+  // and the job location doesn't mention Canada or a known city, REJECT IT.
+  if (filter && filter.toLowerCase().includes('canada')) {
+    const isExplicitlyCanada = isCanadaRegex.test(sLowerRaw) || hasCanadaKeyword;
+    const isExplicitlyRemote = sLowerRaw.includes('remote') || sLowerRaw.includes('anywhere');
+    
+    // If it's remote but DOES NOT mention a Canadian city or Canada, it's global remote. Reject it.
+    if (isExplicitlyRemote && !isExplicitlyCanada) return null;
+    
+    // If it's not remote AND doesn't mention Canada/Province, reject it.
+    if (!isExplicitlyRemote && !isExplicitlyCanada) return null;
+  }
+
+  if (!bestLoc) return null; 
 
   let loc = bestLoc;
   const lower = loc.toLowerCase();
@@ -325,14 +344,12 @@ function normalizeLocation(raw, studioCity = '') {
     if (lower === fullName) return code;
   }
 
-  // 5. Fix common messy patterns
   loc = loc.replace(/, Quebec/i, ', QC')
            .replace(/, Ontario/i, ', ON')
            .replace(/, British Columbia/i, ', BC')
            .replace(/, Alberta/i, ', AB')
            .replace(/, Nova Scotia/i, ', NS');
 
-  // 6. Final Polish: "City, PROV"
   if (loc.includes(',')) {
     const parts = loc.split(',');
     const city = parts[0].trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
@@ -377,7 +394,7 @@ async function scrapeGreenhouse(studio) {
 
     return jobs
       .map(job => {
-        const cleanLoc = normalizeLocation(job.location?.name || '', studio.city);
+        const cleanLoc = normalizeLocation(job.location?.name || '', studio.city, studio.locationFilter);
         if (!cleanLoc) return null;
 
         return {
@@ -415,7 +432,7 @@ async function scrapeLever(studio) {
 
     return jobs
       .map(job => {
-        const cleanLoc = normalizeLocation(job.categories?.location || '', studio.city);
+        const cleanLoc = normalizeLocation(job.categories?.location || '', studio.city, studio.locationFilter);
         if (!cleanLoc) return null;
 
         return {
@@ -455,7 +472,7 @@ async function scrapeSmartRecruiters(studio) {
     return jobs
       .map(job => {
         const rawLoc = `${job.location?.city || ''}, ${job.location?.region || ''}`.trim().replace(/^,|,$/g, '');
-        const cleanLoc = normalizeLocation(rawLoc, studio.city);
+        const cleanLoc = normalizeLocation(rawLoc, studio.city, studio.locationFilter);
         if (!cleanLoc) return null;
 
         return {
@@ -494,7 +511,7 @@ async function scrapeAshby(studio) {
 
     return jobs
       .map(job => {
-        const cleanLoc = normalizeLocation(job.location || '', studio.city);
+        const cleanLoc = normalizeLocation(job.location || '', studio.city, studio.locationFilter);
         if (!cleanLoc) return null;
 
         return {
@@ -556,7 +573,7 @@ async function scrapeWorkday(studio) {
 
           const processed = jobs
             .map(job => {
-              const cleanLoc = normalizeLocation(job.locationsText || '', studio.city);
+              const cleanLoc = normalizeLocation(job.locationsText || '', studio.city, studio.locationFilter);
               if (!cleanLoc) return null;
 
               return {
