@@ -61,45 +61,47 @@ async function postToLinkedIn(message) {
         return;
     }
 
-    console.log('📣 Posting to LinkedIn...');
+    console.log('📣 Posting to LinkedIn (Using 2026 Posts API)...');
 
-    const url = 'https://api.linkedin.com/v2/ugcPosts';
+    const url = 'https://api.linkedin.com/rest/posts';
+    
+    // New 2026 Payload Structure
     const payload = {
         "author": LINKEDIN_AUTHOR_URN,
-        "lifecycleState": "PUBLISHED",
-        "specificContent": {
-            "com.linkedin.ugc.ShareContent": {
-                "shareCommentary": {
-                    "text": message
-                },
-                "shareMediaCategory": "NONE"
-            }
+        "commentary": message,
+        "visibility": "PUBLIC",
+        "distribution": {
+            "feedDistribution": "MAIN_FEED",
+            "targetEntities": [],
+            "thirdPartyDistributionChannels": []
         },
-        "visibility": {
-            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-        }
+        "lifecycleState": "PUBLISHED",
+        "isReshareDisabledByAuthor": false
     };
-
-    if (!LINKEDIN_AUTHOR_URN.startsWith('urn:li:')) {
-        console.warn('⚠️ WARNING: LINKEDIN_AUTHOR_URN should start with "urn:li:person:" or "urn:li:organization:". Current value:', LINKEDIN_AUTHOR_URN);
-    }
 
     try {
         const response = await axios.post(url, payload, {
             headers: {
                 'Authorization': `Bearer ${LINKEDIN_ACCESS_TOKEN}`,
                 'Content-Type': 'application/json',
+                'LinkedIn-Version': '202604', // Mandatory versioning for 2026
                 'X-Restli-Protocol-Version': '2.0.0'
             }
         });
-        console.log('✅ LinkedIn post successful:', response.data.id);
+        
+        // The new API returns 201 Created on success
+        const postId = response.headers['x-restli-id'] || response.data.id;
+        console.log('✅ LinkedIn post successful! Post URN:', postId);
     } catch (error) {
         if (error.response) {
             console.error('❌ LinkedIn API Error (Status ' + error.response.status + '):');
             console.error(JSON.stringify(error.response.data, null, 2));
+            
             if (error.response.status === 403) {
-                console.error('\n💡 HINT: This usually means your LINKEDIN_AUTHOR_URN is incorrect or doesn\'t match your token owner.');
-                console.error('👉 Run "node scripts/verify-linkedin.js" to find your correct URN.');
+                console.error('\n💡 HINT: This is a 403 Forbidden. Possible reasons:');
+                console.error('1. Your Token owner DOES NOT match the Author URN.');
+                console.error('2. Your App is missing the "Share on LinkedIn" or "W_member_social" permission.');
+                console.error('3. You are trying to post as a page you don\'t manage.');
             }
         } else {
             console.error('❌ Error posting to LinkedIn:', error.message);
