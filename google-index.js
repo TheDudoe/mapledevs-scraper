@@ -14,6 +14,8 @@ async function run() {
         return;
     }
 
+    let keyData = null;
+
     // Fortress Key Repair — Handles B64, JSON, and PEM mangling
     function repairKey(raw) {
         if (!raw) return null;

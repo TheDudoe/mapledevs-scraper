@@ -13,9 +13,28 @@ async function postToLinkedIn(message) {
 
     console.log('📣 Posting to LinkedIn...');
 
+    // Fortress URN Repair — Ensures it's a valid Person or Org URN
+    function repairUrn(raw) {
+        if (!raw) return null;
+        let u = raw.trim();
+        if (u.startsWith('urn:li:')) return u;
+        // If it starts with person: or organization:
+        if (u.startsWith('person:')) return `urn:li:${u}`;
+        if (u.startsWith('organization:')) return `urn:li:${u}`;
+        // If it's just a number/ID, default to person
+        if (/^\d+$/.test(u) || /^[a-zA-Z0-9_-]+$/.test(u)) return `urn:li:person:${u}`;
+        return u;
+    }
+
+    const authorUrn = repairUrn(PRESET_AUTHOR_URN);
+    if (!authorUrn) {
+        console.error('❌ LinkedIn Author URN missing!');
+        return;
+    }
+
     const url = 'https://api.linkedin.com/v2/ugcPosts';
     const payload = {
-        "author": PRESET_AUTHOR_URN,
+        "author": authorUrn,
         "lifecycleState": "PUBLISHED",
         "specificContent": {
             "com.linkedin.ugc.ShareContent": {
