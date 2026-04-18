@@ -3,75 +3,80 @@ const fs = require('fs');
 const path = require('path');
 
 const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
-const TEMP_KEY_PATH = path.join(__dirname, 'google_key_tmp.json');
 
-const rawKey = process.env.GOOGLE_INDEXING_KEY;
-
-if (!rawKey) {
-    console.log('⚠️ No GOOGLE_INDEXING_KEY found. Skipping indexing.');
-    process.exit(0);
-}
-
-// THE STABLE FILE STRATEGY
-// We write the key to a shielded file so the library can parse it natively
-try {
-    let keyObject;
-    try {
-        keyObject = JSON.parse(rawKey.trim());
-    } catch (e) {
-        const decoded = Buffer.from(rawKey.trim(), 'base64').toString('utf8');
-        keyObject = JSON.parse(decoded);
-    }
-    
-    // Repair the private key newlines one last time inside the object
-    keyObject.private_key = keyObject.private_key.replace(/\\n/g, '\n');
-    
-    fs.writeFileSync(TEMP_KEY_PATH, JSON.stringify(keyObject));
-} catch (err) {
-    console.error('❌ Failed to prepare key file:', err.message);
-    process.exit(0); // Exit gracefully so the website still updates
-}
-
-async function indexUrls() {
+async function run() {
     console.log('🔗 Starting Google Indexing...');
+    
+    // 1. Get the Key (from Env or Local File)
+    let keyData;
+    const rawKey = process.env.GOOGLE_INDEXING_KEY;
+    
+    if (rawKey) {
+        console.log('🔑 Using GOOGLE_INDEXING_KEY from environment.');
+        try {
+            keyData = JSON.parse(rawKey.trim());
+        } catch (e) {
+            const decoded = Buffer.from(rawKey.trim(), 'base64').toString('utf8');
+            keyData = JSON.parse(decoded);
+        }
+    } else {
+        const localPath = 'c:/Users/wupei/Downloads/mapledevs-493406-92f28ff2a109.json';
+        if (fs.existsSync(localPath)) {
+            console.log('🔑 Using local key file for testing.');
+            keyData = JSON.parse(fs.readFileSync(localPath, 'utf8'));
+        }
+    }
+
+    if (!keyData) {
+        console.error('❌ No valid credentials found.');
+        return;
+    }
+
+    // "Repair" the key string just in case of GitHub mangle
+    if (keyData.private_key) {
+        keyData.private_key = keyData.private_key.replace(/\\n/g, '\n');
+    }
+
     try {
-        const auth = new google.auth.GoogleAuth({
-            keyFile: TEMP_KEY_PATH,
-            scopes: ['https://www.googleapis.com/auth/indexing'],
-        });
-        const jwtClient = await auth.getClient();
-        const indexing = google.indexing('v3');
+        // 2. Use the official "fromJSON" method (most robust way to handle keys)
+        const auth = google.auth.fromJSON(keyData);
+        auth.scopes = ['https://www.googleapis.com/auth/indexing'];
+        
+        const indexing = google.indexing({ version: 'v3', auth });
 
         if (!fs.existsSync(SITEMAP_PATH)) {
-            console.error('⚠️ sitemap.xml missing. Skipping.');
+            console.error('❌ sitemap.xml missing!');
             return;
         }
 
         const sitemap = fs.readFileSync(SITEMAP_PATH, 'utf8');
+        const urls = [];
         const urlRegex = /<loc>(https:\/\/mapledevs\.ca\/.*?)<\/loc>/g;
         let match;
-        const urls = [];
         while ((match = urlRegex.exec(sitemap)) !== null) urls.push(match[1]);
 
-        console.log(`🔍 Pinging ${urls.length} URLs...`);
+        console.log(`🔍 Pinging ${urls.length} URLs to Google...`);
 
         for (const url of urls) {
             try {
-                await new Promise(resolve => setTimeout(resolve, 300)); 
+                await new Promise(r => setTimeout(r, 200));
                 await indexing.urlNotifications.publish({
-                    auth: jwtClient,
                     requestBody: { url: url, type: 'URL_UPDATED' }
                 });
                 console.log(`✅ Indexed: ${url}`);
             } catch (err) {
-                console.log(`⚠️ Skip ${url}: ${err.message}`);
+                console.log(`⚠️ Warning for ${url}: ${err.message}`);
+                if (err.message.includes('403')) {
+                    console.error('🛑 ERROR: Service Account needs "Owner" role in Search Console!');
+                    process.exit(1);
+                }
             }
         }
+        console.log('✨ Google Indexing phase complete.');
     } catch (err) {
-        console.error('⚠️ Google Auth Error:', err.message);
-    } finally {
-        if (fs.existsSync(TEMP_KEY_PATH)) fs.unlinkSync(TEMP_KEY_PATH);
+        console.error('❌ Google Auth Error:', err.message);
+        process.exit(1);
     }
 }
 
-indexUrls();
+run().catch(console.error);
