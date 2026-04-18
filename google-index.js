@@ -126,8 +126,15 @@ async function run() {
 
     console.log(`🔍 Found ${urls.length} URLs to index.`);
 
+    // Google Indexing API quota is ~200/day. Only submit up to 190 to leave headroom.
+    const MAX_PER_RUN = 190;
+    const batch = urls.slice(0, MAX_PER_RUN);
+    if (urls.length > MAX_PER_RUN) {
+        console.log(`   ⚡ Submitting first ${MAX_PER_RUN} of ${urls.length} (daily quota limit).`);
+    }
+
     let success = 0, fail = 0;
-    for (const url of urls) {
+    for (const url of batch) {
         try {
             await axios.post('https://indexing.googleapis.com/v3/urlNotifications:publish', {
                 url: url,
@@ -140,10 +147,15 @@ async function run() {
             });
             success++;
             console.log(`   ✅ ${url}`);
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 150));
         } catch (err) {
-            fail++;
             const msg = err.response?.data?.error?.message || err.message;
+            // Stop immediately on quota errors instead of spamming failures
+            if (msg.includes('Quota') || msg.includes('quota') || err.response?.status === 429) {
+                console.log(`   ⚠️ Quota limit reached after ${success} URLs. Will continue tomorrow.`);
+                break;
+            }
+            fail++;
             console.log(`   ❌ ${url}: ${msg}`);
         }
     }
@@ -153,3 +165,4 @@ async function run() {
 run().catch(err => {
     console.error('❌ Indexing script error:', err.message);
 });
+
