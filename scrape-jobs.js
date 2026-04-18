@@ -275,52 +275,41 @@ const CANADA_KEYWORDS = [
  */
 /**
  * Normalizes messy locations into "City, Prov" format.
+ * THE FORTRESS: Whitelist-Only Mode. 
  */
 function normalizeLocation(raw, studioCity = '', filter = null) {
   if (!raw || raw.toLowerCase().includes('blank')) return studioCity || 'Canada';
 
-  const sLowerRaw = raw.toLowerCase();
+  const sLowerRaw = raw.toLowerCase().replace(/[\W_]+/g, ' '); // Clean for matching
   
-  // High-Confidence Blocklist: Major tech hubs & US States
-  const isForeignRegex = /france|paris|germany|berlin|usa|united states|united kingdom|uk\b|england|india|bangalore|japan|tokyo|spain|madrid|barcelona|brazil|mexico|australia|austin|seattle|california|texas|florida|\bTX\b|\bWA\b|\bNY\b|\bFL\b|\bIL\b|\bMA\b|\bGA\b|\bNC\b/i;
-  
-  // Canada check: Must have province or explicit "Canada" or be a known city
-  const isCanadaRegex = /canada|, ca\b|, on\b|, qc\b|, bc\b|, ab\b|, sk\b|, mb\b|, ns\b|, nb\b|, pe\b|, nl\b|ontario|quebec|british columbia|alberta|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland/i;
+  // Whitelist: Must have one of these or it's GONE.
+  const isCanadaRegex = /, ca\b|, on\b|, qc\b|, bc\b|, ab\b|, sk\b|, mb\b|, ns\b|, nb\b|, pe\b|, nl\b|ontario|quebec|british columbia|alberta|manitoba|saskatchewan|nova scotia|new brunswick|newfoundland/i;
   const hasCanadaKeyword = CANADA_KEYWORDS.some(k => sLowerRaw.includes(k));
 
-  // 1. Parse all possible locations (some ATS list multiple)
+  // Global Noise: If it mentions these, it's an immediate fail (even if it says Remote)
+  const globalNoise = /france|paris|germany|berlin|india|bangalore|japan|tokyo|spain|madrid|barcelona|brazil|mexico|australia|uk\b|england|london\s+england/i;
+  if (globalNoise.test(sLowerRaw)) return null;
+
+  // 1. Strict Requirement Check
+  const isStrictlyCanada = isCanadaRegex.test(sLowerRaw) || hasCanadaKeyword;
+  const isExplicitlyRemote = sLowerRaw.includes('remote') || sLowerRaw.includes('anywhere');
+
+  if (filter && filter.toLowerCase().includes('canada')) {
+    if (!isStrictlyCanada && !isExplicitlyRemote) return null; // Not Canada, not Remote? Reject.
+    if (isExplicitlyRemote && !isStrictlyCanada) return null;  // Remote but no Canada context? Reject.
+  }
+
+  // 2. Parse segments
   const segments = raw.split(/[;/]/).map(s => s.trim());
-  
-  // 2. Filter for the BEST location
   let bestLoc = null;
 
   for (const seg of segments) {
     const sLower = seg.toLowerCase();
+    if (globalNoise.test(sLower)) continue;
     
-    // If THIS specific segment is foreign, ignore it
-    if (isForeignRegex.test(sLower) && !isCanadaRegex.test(sLower)) continue;
-
-    const hasProv = isCanadaRegex.test(sLower);
-    const hasCity = CANADA_KEYWORDS.some(k => sLower.includes(k));
-    const isRemote = sLower.includes('remote') || sLower.includes('anywhere');
-
-    // Priority: Explicit Canada > Known City > Remote
-    if (hasProv) { bestLoc = seg; break; }
-    if (hasCity && !bestLoc) bestLoc = seg;
-    if (isRemote && !bestLoc) bestLoc = seg;
-  }
-
-  // CRITICAL FIREWALL: If the studio has a filter (like "Canada"), 
-  // and the job location doesn't mention Canada or a known city, REJECT IT.
-  if (filter && filter.toLowerCase().includes('canada')) {
-    const isExplicitlyCanada = isCanadaRegex.test(sLowerRaw) || hasCanadaKeyword;
-    const isExplicitlyRemote = sLowerRaw.includes('remote') || sLowerRaw.includes('anywhere');
-    
-    // If it's remote but DOES NOT mention a Canadian city or Canada, it's global remote. Reject it.
-    if (isExplicitlyRemote && !isExplicitlyCanada) return null;
-    
-    // If it's not remote AND doesn't mention Canada/Province, reject it.
-    if (!isExplicitlyRemote && !isExplicitlyCanada) return null;
+    if (isCanadaRegex.test(sLower)) { bestLoc = seg; break; }
+    if (CANADA_KEYWORDS.some(k => sLower.includes(k))) { bestLoc = seg; break; }
+    if (sLower.includes('remote') || sLower.includes('anywhere')) { bestLoc = seg; }
   }
 
   if (!bestLoc) return null; 
@@ -328,33 +317,25 @@ function normalizeLocation(raw, studioCity = '', filter = null) {
   let loc = bestLoc;
   const lower = loc.toLowerCase();
 
-  // 3. THE "REMOTE" RULE: If it's remote, just write "Remote"
-  if (lower.includes('remote') || lower.includes('anywhere')) {
-    return 'Remote';
-  }
+  if (lower.includes('remote') || lower.includes('anywhere')) return 'Remote';
 
-  // 4. Clean up generic junk
   loc = loc.replace(/, Canada/i, '').replace(/Canada/i, '').trim();
   if (!loc || loc === ',') return studioCity || 'Canada';
 
-  // 5. Standardize Provinces
   for (const [fullName, code] of Object.entries(PROVINCE_MAP)) {
     const regex = new RegExp(`,\\s*${fullName}$`, 'i');
     if (regex.test(loc)) return loc.replace(regex, `, ${code}`);
     if (lower === fullName) return code;
   }
 
-  loc = loc.replace(/, Quebec/i, ', QC')
-           .replace(/, Ontario/i, ', ON')
-           .replace(/, British Columbia/i, ', BC')
-           .replace(/, Alberta/i, ', AB')
-           .replace(/, Nova Scotia/i, ', NS');
+  loc = loc.replace(/, Quebec/i, ', QC').replace(/, Ontario/i, ', ON')
+           .replace(/, British Columbia/i, ', BC').replace(/, Alberta/i, ', AB');
 
   if (loc.includes(',')) {
     const parts = loc.split(',');
     const city = parts[0].trim().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
     const prov = parts[1].trim().toUpperCase();
-    if (prov.length === 2 && !isForeignRegex.test(prov)) return `${city}, ${prov}`;
+    if (prov.length === 2) return `${city}, ${prov}`;
   }
 
   return loc;

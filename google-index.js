@@ -1,15 +1,16 @@
-const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const axios = require('axios');
 
 const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
 
 async function run() {
-    console.log('🔗 Starting Google Indexing (Universal Crypto Mode)...');
+    console.log('🔗 Starting Google Indexing (Manual-Sign Mode)...');
     
     const rawKey = process.env.GOOGLE_INDEXING_KEY;
     if (!rawKey) {
-        console.error('❌ GOOGLE_INDEXING_KEY not found!');
+        console.error('❌ GOOGLE_INDEXING_KEY missing!');
         return;
     }
 
@@ -17,56 +18,62 @@ async function run() {
     try {
         let sanitized = rawKey.trim();
         if (sanitized.startsWith('"') && sanitized.endsWith('"')) sanitized = sanitized.slice(1, -1);
-        
-        // Handle Base64 vs Raw JSON
-        if (!sanitized.startsWith('{')) {
-            sanitized = Buffer.from(sanitized, 'base64').toString('utf8');
-        }
-        
-        // Fix mangled newlines
+        if (!sanitized.startsWith('{')) sanitized = Buffer.from(sanitized, 'base64').toString('utf8');
         keyData = JSON.parse(sanitized.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n'));
     } catch (e) {
-        // Pattern-based rescue
+        console.error('⚠️ Key parsing failed. Using pattern rescue.');
         const emailMatch = /"client_email":\s*"([^"]+)"/.exec(rawKey);
         const keyMatch = /"private_key":\s*"([^"]+)"/.exec(rawKey);
         if (emailMatch && keyMatch) {
-            keyData = {
-                client_email: emailMatch[1],
-                private_key: keyMatch[1].replace(/\\\\n/g, '\n').replace(/\\n/g, '\n')
+            keyData = { 
+                client_email: emailMatch[1], 
+                private_key: keyMatch[1].replace(/\\\\n/g, '\n').replace(/\\n/g, '\n') 
             };
         }
     }
 
     if (!keyData || !keyData.private_key) {
-        console.error('❌ FATAL: Key extraction failed.');
+        console.error('❌ FATAL: Private key missing.');
         return;
     }
 
-    // 🧬 THE UNIVERSAL CRYPTO REPAIR 🧬
-    // Convert PKCS#1 (RSA) to PKCS#8 (Standard)
-    // PKCS#1: -----BEGIN RSA PRIVATE KEY-----
-    // PKCS#8: -----BEGIN PRIVATE KEY----- (This is what OpenSSL 3.0 wants)
-    let pk = keyData.private_key.trim();
+    const clientEmail = keyData.client_email;
+    let privateKey = keyData.private_key.trim();
     
-    // 1. Remove "RSA" from headers to force PKCS#8 interpretation
-    pk = pk.replace(/-----BEGIN RSA PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
-    pk = pk.replace(/-----END RSA PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
-    
-    // 2. Ensure internal structure is clean
-    if (!pk.includes('-----BEGIN')) {
-        pk = `-----BEGIN PRIVATE KEY-----\n${pk}\n-----END PRIVATE KEY-----`;
+    // Convert to PKCS#8 for max compatibility
+    privateKey = privateKey.replace(/-----BEGIN RSA PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
+    privateKey = privateKey.replace(/-----END RSA PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
+    if (!privateKey.includes('-----BEGIN')) {
+        privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----`;
     }
-    pk = pk.split('\\n').join('\n');
+    privateKey = privateKey.split('\\n').join('\n');
 
-    console.log(`📧 Agent: ${keyData.client_email}`);
+    /**
+     * MANUAL JWT SIGNING (Bypasses Google Library's OpenSSL 3.0 issues)
+     */
+    function signJwt() {
+        const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
+        const now = Math.floor(Date.now() / 1000);
+        const payload = Buffer.from(JSON.stringify({
+            iss: clientEmail,
+            sub: clientEmail,
+            aud: 'https://indexing.googleapis.com/',
+            iat: now,
+            exp: now + 3600,
+            scope: 'https://www.googleapis.com/auth/indexing'
+        })).toString('base64url');
+
+        const input = `${header}.${payload}`;
+        const signature = crypto.createSign('RSA-SHA256')
+            .update(input)
+            .sign(privateKey, 'base64url');
+        
+        return `${input}.${signature}`;
+    }
 
     try {
-        const auth = google.auth.fromJSON({
-            client_email: keyData.client_email,
-            private_key: pk
-        });
-        auth.scopes = ['https://www.googleapis.com/auth/indexing'];
-        const indexing = google.indexing({ version: 'v3', auth });
+        const jwt = signJwt();
+        console.log(`✅ Manual JWT generated. Service: ${clientEmail}`);
 
         if (!fs.existsSync(SITEMAP_PATH)) {
             console.error('❌ sitemap.xml missing!');
@@ -79,21 +86,30 @@ async function run() {
         let match;
         while ((match = urlRegex.exec(sitemap)) !== null) urls.push(match[1]);
 
-        console.log(`🔍 Ping ${urls.length} URLs...`);
+        console.log(`🔍 Found ${urls.length} URLs. Pinging Google...`);
 
         for (const url of urls) {
             try {
-                await indexing.urlNotifications.publish({
-                    requestBody: { url: url, type: 'URL_UPDATED' }
+                // Post directly to Google REST API
+                await axios.post('https://indexing.googleapis.com/v3/urlNotifications:publish', {
+                    url: url,
+                    type: 'URL_UPDATED'
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${jwt}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 console.log(`✅ Indexed: ${url}`);
+                await new Promise(r => setTimeout(r, 100));
             } catch (err) {
-                console.log(`❌ Fail ${url}: ${err.message}`);
-                // If it still fails, it's likely a Search Console permission issue, not a key issue
+                console.log(`❌ Fail ${url}: ${err.response?.data?.error?.message || err.message}`);
+                // If it hits a quota or permission error, we log but keep going
             }
         }
+        console.log('✨ Manual Indexing Complete.');
     } catch (err) {
-        console.error('❌ Crypto/Auth Error:', err.message);
+        console.error('❌ Manual Sign Error:', err.message);
     }
 }
 
