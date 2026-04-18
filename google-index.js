@@ -16,7 +16,7 @@ async function run() {
 
     let keyData;
     try {
-        let sanitized = rawKey.trim();
+        let sanitized = rawKey.trim().replace(/\s+/g, '');
         if (sanitized.startsWith('"') && sanitized.endsWith('"')) sanitized = sanitized.slice(1, -1);
         if (!sanitized.startsWith('{')) sanitized = Buffer.from(sanitized, 'base64').toString('utf8');
         keyData = JSON.parse(sanitized.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n'));

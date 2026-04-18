@@ -780,12 +780,35 @@ async function updateGoogleSheet(scrapedJobs) {
 
   try {
     const { google } = require('googleapis');
-    let privateKey = privateKeyB64;
-    if (!privateKey.includes('BEGIN PRIVATE KEY')) {
-      privateKey = Buffer.from(privateKeyB64, 'base64').toString('utf-8');
-    } else {
-      privateKey = privateKey.replace(/\\n/g, '\n');
+    let privateKey = privateKeyB64.trim().replace(/\s+/g, '');
+    
+    // 1. Handle Base64 Decode
+    if (!privateKey.includes('-----BEGIN')) {
+      try {
+        privateKey = Buffer.from(privateKey, 'base64').toString('utf-8');
+      } catch (e) {
+        console.error('❌ Base64 decode failed for Sheet key.');
+      }
     }
+
+    // 2. Wash and Repair (Universal Mode)
+    if (privateKey.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(privateKey.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n'));
+        privateKey = parsed.private_key || privateKey;
+      } catch (e) {
+        // Fallback for mangled JSON
+        const match = /"private_key":\s*"([^"]+)"/.exec(privateKey);
+        if (match) privateKey = match[1].replace(/\\\\n/g, '\n').replace(/\\n/g, '\n');
+      }
+    }
+    
+    privateKey = privateKey.replace(/-----BEGIN RSA PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
+    privateKey = privateKey.replace(/-----END RSA PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
+    if (!privateKey.includes('-----BEGIN')) {
+        privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----`;
+    }
+    privateKey = privateKey.replace(/\\n/g, '\n').replace(/\\\\n/g, '\n');
 
     const auth = new google.auth.JWT(clientEmail, null, privateKey, [
       'https://www.googleapis.com/auth/spreadsheets',
