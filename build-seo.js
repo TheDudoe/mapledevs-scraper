@@ -10,9 +10,9 @@ const SHEET_ID = '2PACX-1vSkt2ROoihRVsL4f0m4dXZ1IzD7KYzEghgOwW7QPC2EN6sE4D_iI3st
 const SEO_TARGETS = [
     { folder: 'vancouver', hash: '#city=Vancouver', title: 'Vancouver Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Vancouver, BC. No US roles. Salaries, entry-level, and remote roles included.' },
     { folder: 'toronto', hash: '#city=Toronto', title: 'Toronto Game Dev Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Toronto, ON. No US roles.' },
-    { folder: 'montreal', hash: '#city=Montreal', title: 'Montreal Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Montreal, QC. Best opportunities in Canada.' },
+    { folder: 'montreal', hash: '#city=Montreal', title: 'Montreal Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Montreal, QC. Best opportunities in Canada.', title_fr: 'Emplois Studios de Jeux Montréal | MapleDevs', desc_fr: 'Trouvez des emplois vérifiés dans les studios de jeux à Montréal, QC. Meilleures opportunités au Canada.' },
     { folder: 'ottawa', hash: '#city=Ottawa', title: 'Ottawa Game Dev Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Ottawa, ON.' },
-    { folder: 'quebec-city', hash: '#city=Quebec+City', title: 'Quebec City Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Quebec City, QC.' },
+    { folder: 'quebec-city', hash: '#city=Quebec+City', title: 'Quebec City Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Quebec City, QC.', title_fr: 'Emplois Studios de Jeux Québec | MapleDevs', desc_fr: 'Trouvez des emplois vérifiés dans les studios de jeux à Québec, QC.' },
     { folder: 'edmonton', hash: '#city=Edmonton', title: 'Edmonton Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Edmonton, AB.' },
     { folder: 'calgary', hash: '#city=Calgary', title: 'Calgary Game Dev Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Calgary, AB.' },
     { folder: 'victoria', hash: '#city=Victoria', title: 'Victoria Game Dev Jobs | BC Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Victoria, BC.' },
@@ -111,6 +111,28 @@ function injectSEO(html, target, targetJobs = []) {
         
         const jobListRegex = /<div id="job-list">[\s\S]*?<\/div>/;
         output = output.replace(jobListRegex, `<div id="job-list">${jobsHtml}</div>`);
+    }
+
+    // Hub Context Injection
+    const HUB_CONTEXTS = {
+        'montreal': { t: 'Montreal Gamedev Insights', p: 'Montreal studios benefit from the MDEC tax credit (up to 37.5%). Discover AAA and indie roles here.' },
+        'quebec-city': { t: 'Quebec City Gamedev', p: 'A thriving hub with MDEC incentives. Home to giants like Ubisoft and Beenox.' },
+        'vancouver': { t: 'Vancouver Studio Guide', p: 'Canada\'s original hub featuring the IDMTC tax credit. Ideal for AAA and Indie talent.' },
+        'toronto': { t: 'Toronto & GTA Scenes', p: 'Massive indie ecosystem and growing AAA presence supported by OIDMTC incentives.' }
+    };
+
+    if (HUB_CONTEXTS[target.folder]) {
+        const ctx = HUB_CONTEXTS[target.folder];
+        const ctxHtml = `<div class="hub-highlights" style="display:block; margin-bottom:1rem; border-left:4px solid #C8372D; padding:1rem; background:#f9f9f9;">
+            <h3 style="margin:0 0 0.5rem 0; font-size:1.1rem; color:#C8372D;">${ctx.t}</h3>
+            <p style="margin:0; font-size:0.9rem; line-height:1.4;">${ctx.p}</p>
+        </div>`;
+        const hubDivRegex = /<div id="hub-highlights" class="hub-highlights"><\/div>/;
+        output = output.replace(hubDivRegex, ctxHtml);
+    }
+    
+    if (target.title_fr) {
+        output = output.replace('</h1>', `</h1><h2 style="font-size:1.2rem; color:#666; margin-top:-0.5rem;">${target.title_fr}</h2>`);
     }
 
     return output;

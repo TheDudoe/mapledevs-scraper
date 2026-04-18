@@ -444,6 +444,8 @@ async function scrapeGreenhouse(studio) {
           featured: 'No',
           student: guessStudentFriendly(job.title, job.content || '') ? 'Yes' : 'No',
           salary: guessSalary(job.content || ''),
+          engine: guessEngine(job.title, job.content || ''),
+          visa: guessVisaSponsorship(job.title, job.content || ''),
           sourceId: `gh_${studio.token}_${job.id}`,
         };
       })
@@ -482,6 +484,8 @@ async function scrapeLever(studio) {
           featured: "No",
           student: guessStudentFriendly(job.text, job.descriptionPlain || '') ? 'Yes' : 'No',
           salary: guessSalary(job.descriptionPlain || ''),
+          engine: guessEngine(job.text, job.descriptionPlain || ''),
+          visa: guessVisaSponsorship(job.text, job.descriptionPlain || ''),
           sourceId: `lv_${studio.token}_${job.id}`,
         };
       })
@@ -522,6 +526,8 @@ async function scrapeSmartRecruiters(studio) {
           featured: "No",
           student: guessStudentFriendly(job.name, '') ? 'Yes' : 'No',
           salary: guessSalary(job.name), // SmartRecruiters often lacks desc in list
+          engine: guessEngine(job.name, ''),
+          visa: guessVisaSponsorship(job.name, ''),
           sourceId: `sr_${studio.token}_${job.id}`,
         };
       })
@@ -561,6 +567,8 @@ async function scrapeAshby(studio) {
           featured: "No",
           student: guessStudentFriendly(job.title, job.description || '') ? 'Yes' : 'No',
           salary: guessSalary(job.description || ''),
+          engine: guessEngine(job.title, job.description || ''),
+          visa: guessVisaSponsorship(job.title, job.description || ''),
           sourceId: `as_${studio.token}_${job.id}`,
         };
       })
@@ -623,6 +631,8 @@ async function scrapeWorkday(studio) {
                 featured: "No",
                 student: guessStudentFriendly(job.title, '') ? 'Yes' : 'No',
                 salary: guessSalary(job.title), // Workday list is and limited desc
+                engine: guessEngine(job.title, ''),
+                visa: guessVisaSponsorship(job.title, ''),
                 sourceId: `wd_${studio.subdomain}_${job.bulletFields?.[0] || job.externalPath}`,
               };
             })
@@ -685,6 +695,24 @@ function guessStudentFriendly(title, content) {
   return text.includes('intern') || text.includes('co-op') || text.includes('coop')
     || text.includes('junior') || text.includes('entry level') || text.includes('entry-level')
     || text.includes('new grad') || text.includes('graduate');
+}
+
+function guessEngine(title, content) {
+  const text = (title + ' ' + content).toLowerCase();
+  if (text.includes('unreal') || text.includes('ue4') || text.includes('ue5')) return 'Unreal';
+  if (text.includes('unity')) return 'Unity';
+  if (text.includes('godot')) return 'Godot';
+  if (text.includes('c++') || text.includes('engine programmer')) return 'C++ / Proprietary';
+  return '';
+}
+
+function guessVisaSponsorship(title, content) {
+  const text = (title + ' ' + content).toLowerCase();
+  const keywords = ['relocation', 'sponsorship', 'visa', 'lmia', 'pnp', 'work permit', 'temporary foreign worker', 'tfwp'];
+  for (const kw of keywords) {
+    if (text.includes(kw)) return 'Yes';
+  }
+  return 'No';
 }
 
 function stripHTML(html) {
@@ -825,9 +853,9 @@ async function updateGoogleSheet(scrapedJobs) {
     console.log('To enable Google Sheets sync, set these environment variables:');
     console.log('  GOOGLE_SHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY\n');
     console.log('Scraped jobs (CSV format):\n');
-    console.log('Title,Studio,Location,Type,Mode,Description,Apply URL,Posted,Featured,Student,Salary');
+    console.log('Title,Studio,Location,Type,Mode,Description,Apply URL,Posted,Featured,Student,Salary,Engine,Visa');
     scrapedJobs.forEach(j => {
-      console.log(`"${j.title}","${j.studio}","${j.location}","${j.type}","${j.mode}","${j.description.replace(/"/g, '""')}","${j.applyUrl}","${j.posted}","${j.featured}","${j.student}","${j.salary}"`);
+      console.log(`"${j.title}","${j.studio}","${j.location}","${j.type}","${j.mode}","${j.description.replace(/"/g, '""')}","${j.applyUrl}","${j.posted}","${j.featured}","${j.student}","${j.salary}","${j.engine}","${j.visa}"`);
     });
     return;
   }
@@ -869,7 +897,7 @@ async function updateGoogleSheet(scrapedJobs) {
     ]);
 
     const sheets = google.sheets({ version: 'v4', auth });
-    const range = 'Sheet1!A:K'; // Columns A through K
+    const range = 'Sheet1!A:M'; // Expanded to A:M
 
     // Read existing data
     console.log('\n📖 Reading existing sheet data...');
@@ -939,12 +967,13 @@ async function updateGoogleSheet(scrapedJobs) {
       console.log('\n➕ Adding new jobs...');
       const newRows = newJobs.map(j => [
         j.title, j.studio, j.location, j.type, j.mode,
-        j.description, j.applyUrl, j.posted, j.featured, j.student, j.salary
+        j.description, j.applyUrl, j.posted, j.featured, j.student, j.salary,
+        j.engine, j.visa
       ]);
 
       await sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
-        range: 'Sheet1!A:K',
+        range: 'Sheet1!A:M',
         valueInputOption: 'USER_ENTERED',
         resource: { values: newRows },
       });
