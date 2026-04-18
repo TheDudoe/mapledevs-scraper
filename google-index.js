@@ -14,39 +14,54 @@ async function run() {
         return;
     }
 
-    let keyData;
-    try {
-        let sanitized = rawKey.trim().replace(/\s+/g, '');
-        if (sanitized.startsWith('"') && sanitized.endsWith('"')) sanitized = sanitized.slice(1, -1);
-        if (!sanitized.startsWith('{')) sanitized = Buffer.from(sanitized, 'base64').toString('utf8');
-        keyData = JSON.parse(sanitized.replace(/\\\\n/g, '\n').replace(/\\n/g, '\n'));
-    } catch (e) {
-        console.error('⚠️ Key parsing failed. Using pattern rescue.');
-        const emailMatch = /"client_email":\s*"([^"]+)"/.exec(rawKey);
-        const keyMatch = /"private_key":\s*"([^"]+)"/.exec(rawKey);
-        if (emailMatch && keyMatch) {
-            keyData = { 
-                client_email: emailMatch[1], 
-                private_key: keyMatch[1].replace(/\\\\n/g, '\n').replace(/\\n/g, '\n') 
-            };
+    // Fortress Key Repair — Handles B64, JSON, and PEM mangling
+    function repairKey(raw) {
+        if (!raw) return null;
+        let k = raw.trim();
+        // 1. Handle JSON wrapper or escaped JSON string
+        if (k.startsWith('{') || k.includes('"private_key"')) {
+            try {
+                let j;
+                try { j = JSON.parse(k); } 
+                catch(e) { j = JSON.parse(k.replace(/\\n/g, '\\\\n')); }
+                k = j.private_key || k;
+                if (!keyData) keyData = j; // Pull email if available
+            } catch (e) {
+                const m = /"private_key":\s*"([^"]+)"/.exec(k);
+                if (m) k = m[1];
+            }
         }
+        // 2. Handle Base64
+        if (!k.includes('-----BEGIN')) {
+            try {
+                const b = Buffer.from(k.replace(/\s+/g, ''), 'base64').toString('utf-8');
+                if (b.includes('-----BEGIN')) k = b;
+            } catch (e) {}
+        }
+        // 3. Wash and Polish PEM
+        k = k.replace(/\\n/g, '\n').replace(/\\\\n/g, '\n');
+        k = k.replace(/-----BEGIN RSA PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
+        k = k.replace(/-----END RSA PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
+        if (!k.includes('-----BEGIN')) {
+            k = `-----BEGIN PRIVATE KEY-----\n${k.replace(/\s+/g, '')}\n-----END PRIVATE KEY-----`;
+        }
+        // Final check for survived escapes
+        k = k.split('\\n').join('\n');
+        return k;
     }
 
-    if (!keyData || !keyData.private_key) {
-        console.error('❌ FATAL: Private key missing.');
+    const privateKey = repairKey(rawKey);
+    if (!privateKey) {
+        console.error('❌ FATAL: Private key missing after repair.');
         return;
     }
-
-    const clientEmail = keyData.client_email;
-    let privateKey = keyData.private_key.trim();
     
-    // Convert to PKCS#8 for max compatibility
-    privateKey = privateKey.replace(/-----BEGIN RSA PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
-    privateKey = privateKey.replace(/-----END RSA PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
-    if (!privateKey.includes('-----BEGIN')) {
-        privateKey = `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----`;
+    // Fallback for client email
+    const clientEmail = keyData?.client_email || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    if (!clientEmail) {
+        console.error('❌ FATAL: Service account email missing.');
+        return;
     }
-    privateKey = privateKey.split('\\n').join('\n');
 
     /**
      * MANUAL JWT SIGNING (Bypasses Google Library's OpenSSL 3.0 issues)

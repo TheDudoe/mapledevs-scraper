@@ -37,6 +37,9 @@ async function postToLinkedIn(message) {
         console.log('✅ LinkedIn post successful!');
     } catch (error) {
         console.log('⚠️ LinkedIn post failed (skipping):', error.response ? error.response.status : error.message);
+        if (error.response && error.response.data) {
+            console.log('   Detail:', JSON.stringify(error.response.data));
+        }
     }
 }
 
