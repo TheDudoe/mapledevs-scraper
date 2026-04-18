@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapleDevs Command Center</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍁</text></svg>">
+<style>
+/* ═══════ DESIGN SYSTEM ═══════ */
+:root {
+  --bg-top: #0a0a0f;
+  --bg-bot: #14141e;
+  --panel-bg: rgba(25, 25, 35, 0.6);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text-1: #ffffff;
+  --text-2: #8a8d9a;
+  --maple: #c8372d;
+  --maple-glow: rgba(200, 55, 45, 0.2);
+  --maple-acc: #ff4a3d;
+  --status-good: #34d399;
+  --status-warn: #fbbf24;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --blur: blur(20px);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font); color: var(--text-1);
+  background: linear-gradient(135deg, var(--bg-top), var(--bg-bot));
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* ═══════ HEADER ═══════ */
+header {
+  padding: 1.5rem 2rem; border-bottom: 1px solid var(--panel-border);
+  background: rgba(10, 10, 15, 0.7); backdrop-filter: var(--blur);
+  display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;
+}
+.logo { font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+.logo span { color: var(--maple); }
+.header-right { display: flex; align-items: center; gap: 1rem; }
+.time-display { font-size: 0.85rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* ═══════ MAIN LAYOUT ═══════ */
+main { flex: 1; padding: 2rem; display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+/* ═══════ PANELS ═══════ */
+.panel {
+  background: var(--panel-bg); border: 1px solid var(--panel-border);
+  border-radius: 16px; padding: 1.5rem; backdrop-filter: var(--blur);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2); display: flex; flex-direction: column; margin-bottom: 2rem;
+}
+.p-hdr { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+.p-hdr i { color: var(--maple-acc); font-style: normal; margin-right: 8px; }
+
+/* ═══════ TRAFFIC METRICS ═══════ */
+.metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+.metric-card {
+  background: rgba(0,0,0,0.2); border: 1px solid var(--panel-border);
+  border-radius: 12px; padding: 1.25rem; position: relative; overflow: hidden;
+}
+.mc-label { font-size: 0.8rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.mc-val { font-size: 2.5rem; font-weight: 700; margin-top: 0.5rem; letter-spacing: -1px; }
+.mc-trend { font-size: 0.85rem; font-weight: 600; color: var(--status-good); margin-top: 0.25rem; display: inline-block; }
+.mc-glow { position: absolute; width: 100px; height: 100px; background: var(--maple-glow); filter: blur(40px); top: -20px; right: -20px; border-radius: 50%; pointer-events: none; }
+
+/* ═══════ AGENT FLEET ═══════ */
+.agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.agent-card {
+  background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border);
+  border-radius: 12px; padding: 1rem; transition: transform 0.2s, border-color 0.2s;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.agent-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
+.ag-hdr { display: flex; justify-content: space-between; align-items: center; }
+.ag-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+.ag-status { width: 8px; height: 8px; border-radius: 50%; background: var(--status-good); box-shadow: 0 0 8px var(--status-good); }
+.ag-status.working { background: var(--status-warn); box-shadow: 0 0 8px var(--status-warn); animation: pulse 2s infinite; }
+.ag-role { font-size: 0.8rem; color: var(--text-2); }
+.ag-act { font-size: 0.8rem; color: var(--maple-acc); margin-top: 0.5rem; font-family: monospace; background: rgba(200,55,45,0.1); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+/* ═══════ BI ASSISTANT CHAT ═══════ */
+.chat-container { display: flex; flex-direction: column; flex: 1; height: 600px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--panel-border); overflow: hidden; }
+.chat-log { flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
+.msg { display: flex; flex-direction: column; gap: 4px; max-width: 85%; animation: fadeUp 0.3s ease; }
+.msg.user { align-self: flex-end; }
+.msg.ai { align-self: flex-start; }
+.msg-hdr { font-size: 0.75rem; color: var(--text-2); display: flex; gap: 6px; }
+.msg.user .msg-hdr { justify-content: flex-end; }
+.msg-bubble { padding: 12px 16px; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; }
+.msg.user .msg-bubble { background: var(--maple); color: white; border-top-right-radius: 2px; }
+.msg.ai .msg-bubble { background: var(--panel-bg); border: 1px solid var(--panel-border); border-top-left-radius: 2px; }
+.chat-input-c { padding: 1rem; border-top: 1px solid var(--panel-border); background: rgba(25, 25, 35, 0.8); display: flex; gap: 0.5rem; }
+.chat-input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); border-radius: 8px; padding: 12px 16px; color: white; font-family: var(--font); outline: none; transition: border-color 0.2s; }
+.chat-input:focus { border-color: var(--maple); }
+.chat-btn { background: var(--maple); color: white; border: none; border-radius: 8px; padding: 0 1.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.chat-btn:hover { background: var(--maple-acc); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════ SPARKLINE GRAPH ═══════ */
+.graph-c { width: 100%; height: 180px; position: relative; margin-top: 1rem; }
+.g-bar-c { display: flex; align-items: flex-end; justify-content: space-between; height: 100%; padding-top: 20px; gap: 4px; }
+.g-bar { flex: 1; background: var(--maple); opacity: 0.6; border-radius: 4px 4px 0 0; min-height: 5px; transition: height 1s ease; position: relative; cursor: pointer; }
+.g-bar:hover { opacity: 1; }
+.g-bar:hover::after { content: attr(data-val); position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: black; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+
+@media (max-width: 1000px) { main { grid-template-columns: 1fr; } .chat-container { height: 400px; } }
+
+@keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+.shake { animation: shake 0.2s ease-in-out; border-color: var(--maple-acc) !important; }
+</style>
+</head>
+<body>
+
+<!-- PIN LOCK SCREEN -->
+<div id="pin-lock" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0A0A0F; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <h2 style="color:#ffffff; font-weight:800; font-size:2rem; margin-bottom:1rem; letter-spacing:-1px; display:flex; align-items:center; gap:8px;"><span style="color:#C8372D">🍁</span> Command Center</h2>
+  <p style="color:#8a8d9a; margin-bottom:2rem; font-size:0.9rem;">Enter 4-Digit Authorization Code</p>
+  <input type="password" id="pin-input" maxlength="4" style="text-align:center; font-size:2rem; letter-spacing:12px; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:white; outline:none; width:180px; font-family:monospace; box-shadow:0 8px 32px rgba(0,0,0,0.5);" placeholder="••••" autocomplete="off" autofocus>
+  <div id="pin-err" style="color:#ff4a3d; font-size:0.85rem; margin-top:1rem; font-weight:600; min-height:20px; text-transform:uppercase; letter-spacing:1px;"></div>
+</div>
+
+<header>
+  <div class="logo">Maple<span>Devs</span> <i>// Command Center</i></div>
+  <div class="header-right">
+    <button onclick="toggleGithubSettings()" style="background:transparent; border:1px solid var(--panel-border); color:var(--text-2); padding:6px 12px; border-radius:6px; cursor:pointer; font-family:var(--font); transition:0.2s;">⚙️ API Config</button>
+    <div id="clock" class="time-display">00:00:00 SYS</div>
+  </div>
+</header>
+
+<!-- GITHUB CONFIG OVERLAY -->
+<div id="gh-config" style="display:none; position:fixed; right:2rem; top:4.5rem; background:var(--panel-bg); backdrop-filter:var(--blur); border:1px solid var(--panel-border); padding:1rem; border-radius:12px; z-index:100; font-size:0.9rem; width:300px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+  <div style="font-weight:600; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">GitHub API Connection <span style="cursor:pointer; color:var(--text-2);" onclick="toggleGithubSettings()">×</span></div>
+  <input type="text" id="gh-user" placeholder="GitHub Username" style="width:100%; padding:8px; margin-bottom:8px; background:rgba(0,0,0,0.5); border:1px solid var(--panel-border); color:white; border-radius:4px;">
+  <input type="password" id="gh-token" placeholder="Personal Access Token" style="width:100%; padding:8px; margin-bottom:12px; background:rgba(0,0,0,0.5); border:1px solid var(--panel-border); color:white; border-radius:4px;">
+  <button onclick="saveGithubConfig()" style="width:100%; padding:8px; background:var(--maple); color:white; border:none; border-radius:4px; font-weight:600; cursor:pointer;">Save Token</button>
+  <div id="gh-msg" style="margin-top:8px; color:var(--status-good); font-size:0.8rem;"></div>
+</div>
+
+<main>
+  <div class="left-col">
+    <div class="panel">
+      <div class="p-hdr"><i>📊</i> Data Core</div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="mc-glow"></div>
+          <div class="mc-label">Hiring Studios</div>
+          <div class="mc-val" id="met-studios">--</div>
+          <div class="mc-trend">Verified Employers</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-glow"></div>
+          <div class="mc-label">Active Jobs Tracked</div>
+          <div class="mc-val" id="met-jobs">--</div>
+          <div class="mc-trend" style="color:var(--text-2)">Google Sheet Sync</div>
+        </div>
+        <div class="metric-card">
+          <div class="mc-glow"></div>
+          <div class="mc-label">Cities Covered</div>
+          <div class="mc-val" id="met-cities">--</div>
+          <div class="mc-trend" style="color:var(--status-good)">Across Canada</div>
+        </div>
+      </div>
+
+      <div class="p-hdr" style="margin-bottom:0.5rem"><i>📈</i> Job Distribution (By Top Cities)</div>
+      <p style="font-size:0.85rem; color:var(--text-2)">Real-time composition derived from open roles</p>
+      <div class="graph-c"><div class="g-bar-c" id="g-bars"></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="p-hdr"><i>🤖</i> Agent Fleet Status</div>
+      <div class="agent-grid">
+        
+        <div class="agent-card">
+          <div class="ag-hdr"><div class="ag-name">👁️ The Hunter</div><div class="ag-status"></div></div>
+          <div class="ag-role">Automated Job Scraper</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:0.5rem;">
+            <div class="ag-act">IDLE</div>
+            <button onclick="triggerWorkflow('mapledevs-scraper', 'scrape-jobs.yml', this)" style="background:var(--maple); color:white; border:none; padding:4px 10px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;" title="Force scrape jobs instantly via API">ENGAGE</button>
+          </div>
+        </div>
+
+        <div class="agent-card">
+          <div class="ag-hdr"><div class="ag-name">🛡️ The Warden</div><div class="ag-status working"></div></div>
+          <div class="ag-role">Discord Auto-Moderator</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:0.5rem;">
+            <div class="ag-act">LISTENING on Port 3000</div>
+          </div>
+        </div>
+
+        <div class="agent-card">
+          <div class="ag-hdr"><div class="ag-name">🏗️ The Architect</div><div class="ag-status"></div></div>
+          <div class="ag-role">SEO Payload Generator</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:0.5rem;">
+            <div class="ag-act">READY</div>
+            <button onclick="triggerWorkflow('MapleDevs', 'build-seo.yml', this)" style="background:var(--maple); color:white; border:none; padding:4px 10px; border-radius:4px; font-size:0.75rem; font-weight:600; cursor:pointer;" title="Re-build SEO HTML pages via API">ENGAGE</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="panel" style="height: 100%; margin-bottom: 0;">
+      <div class="p-hdr"><i>🧠</i> Business Intelligence Assistant</div>
+      <div class="chat-container">
+        <div class="chat-log" id="chat">
+          <div class="msg ai">
+            <div class="msg-hdr"><span>SYSTEM</span> • <span>Now</span></div>
+            <div class="msg-bubble">Initializing MapleDevs parameters...<br><br>I am your BI Assistant. I can analyze the Google Sheet database in real-time, compute sector statistics, and provide operational insight for the Canadian game industry. What would you like to know?</div>
+          </div>
+        </div>
+        <div class="chat-input-c">
+          <input type="text" id="c-inp" class="chat-input" placeholder="e.g. How many jobs are in Vancouver?" autocomplete="off" onkeypress="if(event.key==='Enter')sendMsg()">
+          <button class="chat-btn" onclick="sendMsg()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ═══════ PIN LOCK LOGIC ═══════
+const ADMIN_PIN = '2026'; // Your secret pin
+const lockScreen = document.getElementById('pin-lock');
+const pinInput = document.getElementById('pin-input');
+const pinErr = document.getElementById('pin-err');
+
+pinInput.addEventListener('input', () => {
+    pinErr.textContent = '';
+    if(pinInput.value.length === 4) {
+        if(pinInput.value === ADMIN_PIN) {
+            lockScreen.style.opacity = '0';
+            lockScreen.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => lockScreen.style.display = 'none', 500);
+        } else {
+            pinErr.textContent = 'Access Denied';
+            pinInput.value = '';
+            pinInput.classList.add('shake');
+            setTimeout(() => pinInput.classList.remove('shake'), 400);
+        }
+    }
+});
+
+// Time Loop
+setInterval(()=>{
+    document.getElementById('clock').textContent = new Date().toISOString().replace('T',' ').substring(0,19) + " SYS";
+}, 1000);
+
+// Remove old mock graph generator; now handled dynamically in load() based on sheet data.
+
+// ═══════ BI ASSISTANT LOGIC ═══════
+const SHEET_ID = '2PACX-1vSkt2ROoihRVsL4f0m4dXZ1IzD7KYzEghgOwW7QPC2EN6sE4D_iI3stfllfdeq61coOrhdi47eeLmoY';
+let JOBS = [];
+
+// Fetch exactly how index.html does
+async function load() {
+    try {
+        const r = await fetch(`https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`);
+        const t = await r.text();
+        const ls = t.trim().split("\n");
+        for(let i=1; i<ls.length; i++){
+            const c = csvLine(ls[i]); if(!c[0]||!c[1])continue;
+            JOBS.push({
+                title: cl(c[0]), studio: cl(c[1]), location: cl(c[2]||""), type: cl(c[3]||""), mode: cl(c[4]||""), desc: cl(c[5]||""), student: cl(c[9]||"").toLowerCase()==="yes"
+            });
+        }
+        
+        // Compute Real Metrics
+        document.getElementById('met-jobs').textContent = JOBS.length;
+        const studios = new Set(JOBS.map(j => j.studio));
+        document.getElementById('met-studios').textContent = studios.size;
+        const cities = new Set(JOBS.map(j => j.location).filter(Boolean));
+        document.getElementById('met-cities').textContent = cities.size;
+
+        // Compute Real Graph (City Distribution)
+        const cityCounts = {};
+        JOBS.forEach(j => { if(j.location) cityCounts[j.location] = (cityCounts[j.location] || 0) + 1; });
+        const topCities = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]).slice(0, 20); // Top 20 bars
+        const maxCityVal = topCities[0]?.[1] || 1;
+        
+        const gb = document.getElementById('g-bars');
+        gb.innerHTML = '';
+        topCities.forEach((cityPair, idx) => {
+            const d = document.createElement('div'); 
+            d.className='g-bar';
+            const pct = Math.max((cityPair[1] / maxCityVal) * 100, 5); // 5% minimum height
+            d.style.height = '0%';
+            setTimeout(()=>d.style.height = pct+'%', 100 + (idx * 50));
+            d.dataset.val = cityPair[0] + ': ' + cityPair[1] + ' roles';
+            gb.appendChild(d);
+        });
+
+        pushMsg('ai', `Connection established. Synchronized **${JOBS.length} active roles** from **${studios.size} studios** across **${cities.size} cities**! Ready for queries.`);
+    } catch(e) { 
+        pushMsg('ai', `Error connecting to database partition: ${e.toString()}`); 
+    }
+}
+
+function csvLine(l) {
+    const r=[]; let c="", q=false;
+    for(let i=0; i<l.length; i++){
+        const ch=l[i]; if(ch==='"') q=!q; else if(ch===',' && !q) { r.push(c); c=""; } else c+=ch;
+    } r.push(c); return r;
+}
+function cl(s) { return s.replace(/^"|"$/g,"").trim(); }
+
+const chat = document.getElementById('chat');
+function pushMsg(type, text) {
+    const d = document.createElement('div'); d.className = `msg ${type}`;
+    d.innerHTML = `<div class="msg-hdr"><span>${type==='user'?'ADMIN':'SYSTEM'}</span> • <span>Now</span></div><div class="msg-bubble">${text}</div>`;
+    chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+}
+
+function sendMsg() {
+    const inp = document.getElementById('c-inp'); const q = inp.value.trim().toLowerCase();
+    if(!q) return; pushMsg('user', q); inp.value='';
+    
+    setTimeout(() => {
+        let res = "Unable to parse request intent. Try asking about remote roles, student roles, or specific cities.";
+        
+        if(q.includes('how many')) {
+            if(q.includes('remote')) {
+                const c = JOBS.filter(j=>j.mode.toLowerCase().includes('remote')).length;
+                res = `Analysis complete. There are currently **${c} Remote roles** listed on MapleDevs, representing ${Math.round((c/JOBS.length)*100)}% of the market.`;
+            } else if(q.includes('student') || q.includes('junior')) {
+                const c = JOBS.filter(j=>j.student || j.title.toLowerCase().includes('junior') || j.type.toLowerCase().includes('intern')).length;
+                res = `There are **${c} Student-friendly or Junior roles** currently active.`;
+            } else if(q.includes('vancouver')) {
+                const c = JOBS.filter(j=>j.location.toLowerCase().includes('vancouver')).length;
+                res = `Vancouver currently hosts **${c} active roles** across the board.`;
+            } else if(q.includes('toronto')) {
+                const c = JOBS.filter(j=>j.location.toLowerCase().includes('toronto')).length;
+                res = `Toronto currently hosts **${c} active roles**.`;
+            } else if(q.includes('all') || q.includes('total') || q.includes('jobs')) {
+                res = `The system is tracking exactly **${JOBS.length}** open job requisitions.`;
+            }
+        } else if(q.includes('top') || q.includes('most')) {
+            if(q.includes('studio') || q.includes('hiring')) {
+                const m={}; JOBS.forEach(j=>{m[j.studio]=(m[j.studio]||0)+1;});
+                const top = Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,3);
+                res = `The top hiring studios right now are:<br>1. **${top[0][0]}** (${top[0][1]} roles)<br>2. **${top[1][0]}** (${top[1][1]} roles)<br>3. **${top[2][0]}** (${top[2][1]} roles)`;
+            }
+        } else if (q.includes('change') || q.includes('add ') || q.includes('fix ') || q.includes('build')) {
+            createGitHubIssue(q);
+            return; // Handled asynchronously
+        }
+
+        pushMsg('ai', res);
+    }, 600);
+}
+
+// ═══════ GITHUB API BRIDGE ═══════
+function getGhAuth() { 
+  return { u: localStorage.getItem('md_gh_username'), t: localStorage.getItem('md_gh_token') }; 
+}
+
+function toggleGithubSettings() {
+    const el = document.getElementById('gh-config');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    const a = getGhAuth();
+    if(a.u) document.getElementById('gh-user').value = a.u;
+    if(a.t) document.getElementById('gh-token').value = a.t;
+}
+
+function saveGithubConfig() {
+    localStorage.setItem('md_gh_username', document.getElementById('gh-user').value);
+    localStorage.setItem('md_gh_token', document.getElementById('gh-token').value);
+    document.getElementById('gh-msg').textContent = 'Configuration Saved!';
+    setTimeout(() => document.getElementById('gh-msg').textContent = '', 2000);
+}
+
+async function triggerWorkflow(repoName, workflowName, btnNode) {
+    const auth = getGhAuth();
+    if(!auth.u || !auth.t) {
+        alert("Please configure your GitHub Username and Personal Access Token in the settings (top right) first.");
+        return;
+    }
+    
+    btnNode.textContent = "FIRING...";
+    btnNode.disabled = true;
+
+    try {
+        const res = await fetch(`https://api.github.com/repos/${auth.u}/${repoName}/actions/workflows/${workflowName}/dispatches`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${auth.t}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ref: 'main' })
+        });
+        
+        if (res.ok) {
+            btnNode.textContent = "DEPLOYED!";
+            btnNode.style.background = "var(--status-good)";
+        } else {
+            throw new Error(`API Error ${res.status}`);
+        }
+    } catch (e) {
+        btnNode.textContent = "ERROR";
+        btnNode.style.background = "var(--status-warn)";
+        console.error(e);
+    }
+    
+    setTimeout(() => {
+        btnNode.textContent = "ENGAGE";
+        btnNode.style.background = "var(--maple)";
+        btnNode.disabled = false;
+    }, 3000);
+}
+
+async function createGitHubIssue(requestText) {
+    const auth = getGhAuth();
+    if(!auth.u || !auth.t) {
+        pushMsg('ai', `I cannot automatically edit the website because there is no GitHub API Key connected. Please open the settings (⚙️) and enter your Personal Access Token, then ask me again.`);
+        return;
+    }
+
+    pushMsg('ai', `Connecting to Antigravity core... dispatching your code change request to the root repository.`);
+    
+    try {
+        const res = await fetch(`https://api.github.com/repos/${auth.u}/MapleDevs/issues`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${auth.t}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                title: `[Dashboard Command] Code Change Request`,
+                body: `The website administrator requested the following change from the Dashboard Command Center:\n\n> "${requestText}"\n\nAI Engineer, please review this request and implement the requested changes.`
+            })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            pushMsg('ai', `✅ Request successfully forwarded to the Engineering AI (Antigravity). An autonomous task ticket has been created: <a href="${data.html_url}" target="_blank" style="color:var(--status-good);">View Ticket #${data.number}</a>. Open your IDE so Antigravity can begin writing the code.`);
+        } else {
+            throw new Error(`API Error ${res.status}`);
+        }
+    } catch (e) {
+        pushMsg('ai', `❌ Ticket creation failed. Verify your GitHub Token has 'repo' access rights.`);
+        console.error(e);
+    }
+}
+
+load();
+</script>
+</body>
+</html>

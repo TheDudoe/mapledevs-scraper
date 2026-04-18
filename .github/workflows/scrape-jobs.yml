@@ -1,0 +1,68 @@
+name: MapleDevs Master Automation
+
+on:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  automation-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Automation
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GOOGLE_INDEXING_KEY: ${{ secrets.GOOGLE_INDEXING_KEY }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_AUTHOR_URN: ${{ secrets.LINKEDIN_AUTHOR_URN || secrets.LINKEDIN_PERSON_URN }}
+        run: |
+          node scrape-jobs.js
+          node build-seo.js
+          node google-index.js
+          node post-linkedin.js
+
+      - name: Prepare Website Files
+        run: |
+          mkdir -p dist
+          # 1. Copy core website files
+          cp index.html dist/ || true
+          cp sitemap.xml dist/ || true
+          cp -r css dist/ || true
+          cp -r assets dist/ || true
+          cp -r js dist/ || true
+          cp -r jobs dist/ || true
+          
+          # 2. Copy all SEO Hub folders (folders created by the build-seo script)
+          # This looks for folders like /vancouver, /art, /programming and copies them
+          for dir in vancouver toronto montreal ottawa quebec-city edmonton calgary victoria london halifax kitchener burnaby programming art design producer qa audio ui-ux junior remote internship about studios saved; do
+            if [ -d "$dir" ]; then
+              cp -r "$dir" dist/
+            fi
+          done
+
+      - name: Push to Website
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.WEBSITE_PUSH_PAT }}
+        with:
+          source-directory: 'dist'
+          destination-github-username: 'TheDudoe'
+          destination-repository-name: 'MapleDevs'
+          user-email: mapledevsbusiness@gmail.com
+          target-branch: main
