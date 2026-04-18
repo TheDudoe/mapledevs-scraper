@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // --- CONFIG ---
-const SITEMAP_PATH = path.join(__dirname, 'sitemap.xml');
+const SITEMAP_PATH = path.join(__dirname, '..', 'sitemap.xml');
 
 let key;
 const rawKey = process.env.GOOGLE_INDEXING_KEY;
@@ -11,9 +11,7 @@ const rawKey = process.env.GOOGLE_INDEXING_KEY;
 if (rawKey) {
     console.log('🔑 GOOGLE_INDEXING_KEY detected. Processing...');
     try {
-        // Robust Parsing: Handle double-quotes, newlines, and escaping
-        const sanitized = rawKey.trim();
-        key = JSON.parse(sanitized);
+        key = JSON.parse(rawKey.trim());
     } catch (e1) {
         try {
             const decoded = Buffer.from(rawKey.trim(), 'base64').toString('utf8');
@@ -24,24 +22,28 @@ if (rawKey) {
             process.exit(1);
         }
     }
+} else {
+    const localPaths = [
+        'c:/Users/wupei/Downloads/mapledevs-493406-92f28ff2a109.json',
+        path.join(__dirname, '..', 'mapledevs-key.json')
+    ];
+    for (const p of localPaths) {
+        if (fs.existsSync(p)) {
+            key = require(p);
+            console.log(`🔑 Using credentials from local file: ${p}`);
+            break;
+        }
+    }
+    if (!key) {
+        console.error(`❌ No credentials found (check env var GOOGLE_INDEXING_KEY)`);
+        process.exit(1);
+    }
 }
-
-if (!key) {
-    console.error(`❌ No credentials found (check env var GOOGLE_INDEXING_KEY)`);
-    process.exit(1);
-}
-
-// THE "NUCLEAR OPTION" FOR THE DECODER ERROR:
-// Manually fix common newline and quote issues that break the OpenSSL decoder
-const privateKey = key.private_key
-    .replace(/\\n/g, '\n')
-    .replace(/\n\n/g, '\n')
-    .trim();
 
 const jwtClient = new google.auth.JWT(
     key.client_email,
     null,
-    privateKey,
+    key.private_key.replace(/\\n/g, '\n'),
     ['https://www.googleapis.com/auth/indexing'],
     null
 );
@@ -51,15 +53,9 @@ async function indexUrls() {
     
     try {
         await jwtClient.authorize();
-        console.log('✅ Google Authentication Successful!');
         const indexing = google.indexing('v3');
 
         // Extract URLs from sitemap
-        if (!fs.existsSync(SITEMAP_PATH)) {
-            console.error('❌ sitemap.xml not found! Build SEO must run first.');
-            return;
-        }
-
         const sitemap = fs.readFileSync(SITEMAP_PATH, 'utf8');
         const urlRegex = /<loc>(https:\/\/mapledevs\.ca\/.*?)<\/loc>/g;
         let match;
@@ -73,8 +69,10 @@ async function indexUrls() {
 
         for (const url of urls) {
             try {
-                await new Promise(resolve => setTimeout(resolve, 300)); 
-                await indexing.urlNotifications.publish({
+                // Rate limiting protection
+                await new Promise(resolve => setTimeout(resolve, 200)); 
+
+                const res = await indexing.urlNotifications.publish({
                     auth: jwtClient,
                     requestBody: {
                         url: url,
@@ -84,11 +82,14 @@ async function indexUrls() {
                 console.log(`✅ Indexed: ${url}`);
             } catch (err) {
                 console.error(`❌ Failed to index ${url}:`, err.message);
+                if (err.message.includes('403')) {
+                    console.error('⚠️ Ensure your service account has OWNER permission in Search Console.');
+                    process.exit(1);
+                }
             }
         }
     } catch (err) {
-        console.error('❌ Authentication failed:', err.message);
-        console.log('💡 HINT: Check if your private key starts with -----BEGIN PRIVATE KEY-----');
+        console.error('❌ Authentication failed:', err);
     }
 }
 
