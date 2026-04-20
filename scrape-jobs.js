@@ -527,7 +527,7 @@ async function scrapeSmartRecruiters(studio) {
           posted: job.releasedDate ? new Date(job.releasedDate).toISOString().split('T')[0] : '',
           featured: "No",
           student: guessStudentFriendly(job.name, '') ? 'Yes' : 'No',
-          salary: guessSalary(job.name), // SmartRecruiters often lacks desc in list
+          salary: guessSalary(job.name),
           engine: guessEngine(job.name, ''),
           visa: guessVisaSponsorship(job.name, ''),
           sourceId: `sr_${studio.token}_${job.id}`,
@@ -701,20 +701,37 @@ function guessStudentFriendly(title, content) {
 
 function guessEngine(title, content) {
   const text = (title + ' ' + content).toLowerCase();
-  if (text.includes('unreal') || text.includes('ue4') || text.includes('ue5')) return 'Unreal';
-  if (text.includes('unity')) return 'Unity';
-  if (text.includes('godot')) return 'Godot';
+  
+  if (/\bunreal\b|ue4|ue5/i.test(text)) return 'Unreal';
+  if (/\bunity\b/i.test(text)) return 'Unity';
+  if (/\bfrostbite\b/i.test(text)) return 'Frostbite';
+  if (/\bsnowdrop\b/i.test(text)) return 'Snowdrop';
+  if (/\bgodot\b/i.test(text)) return 'Godot';
+  if (/\blumberyard\b/i.test(text)) return 'Lumberyard';
+  if (/\bdecima\b/i.test(text)) return 'Decima';
+  if (/\bcryengine\b/i.test(text)) return 'CryEngine';
+  if (/\bredengine\b/i.test(text)) return 'RedEngine';
+  if (/\bre engine\b/i.test(text)) return 'RE Engine';
+  if (/\bnorthlight\b/i.test(text)) return 'Northlight';
+  
   if (text.includes('c++') || text.includes('engine programmer')) return 'C++ / Proprietary';
+  
   return '';
 }
 
 function guessVisaSponsorship(title, content) {
   const text = (title + ' ' + content).toLowerCase();
-  const keywords = ['relocation', 'sponsorship', 'visa', 'lmia', 'pnp', 'work permit', 'temporary foreign worker', 'tfwp'];
-  for (const kw of keywords) {
+  const positiveKeywords = [
+    'relocation assistance', 'relocation support', 'sponsorship', 'visa sponsorship', 
+    'work permit', 'lmia', 'provincial nominee', 'pnp', 'international candidates',
+    'global talent stream', 'can help with relocation', 'tfwp', 'temporary foreign worker'
+  ];
+  
+  for (const kw of positiveKeywords) {
     if (text.includes(kw)) return 'Yes';
   }
-  return 'No';
+  
+  return ''; 
 }
 
 function stripHTML(html) {
