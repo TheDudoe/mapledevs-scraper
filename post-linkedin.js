@@ -98,11 +98,23 @@ async function postToLinkedIn(message) {
 async function run() {
     try {
         const csvData = await axios.get(`https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`).then(r => r.data);
-        const ls = csvData.trim().split("\n");
-        const currentJobs = ls.slice(1).map(l => {
-            const c = l.split(',');
-            return { title: (c[0]||'').replace(/^"|"$/g,''), studio: (c[1]||'').replace(/^"|"$/g,''), location: (c[2]||'').replace(/^"|"$/g,'') };
-        });
+        const rows=[],jobs=[];let r=[],c="",q=false;
+        for(let i=0;i<csvData.length;i++){
+            const ch=csvData[i],nx=csvData[i+1];
+            if(ch==='"'){if(q&&nx==='"'){c+='"';i++;}else{q=!q;}}
+            else if(ch===','&&!q){r.push(c);c="";}
+            else if(ch==='\n'&&!q){r.push(c);rows.push(r);r=[];c="";}
+            else if(ch!=='\r'||q){c+=ch;}
+        }
+        if(r.length||c){r.push(c);rows.push(r);}
+        
+        const cl = (s) => s ? s.trim() : "";
+        const currentJobs = [];
+        for(let i=1; i<rows.length; i++){
+            const rw = rows[i];
+            if(!rw || !rw[0] || !rw[1]) continue;
+            currentJobs.push({ title: cl(rw[0]), studio: cl(rw[1]), location: cl(rw[2]||"") });
+        }
 
         let prevJobs = [];
         if (fs.existsSync(SNAPSHOT_PATH)) prevJobs = JSON.parse(fs.readFileSync(SNAPSHOT_PATH, 'utf8'));
