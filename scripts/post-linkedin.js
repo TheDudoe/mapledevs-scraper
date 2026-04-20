@@ -32,31 +32,25 @@ async function fetchCSV(url) {
 }
 
 function parseCSV(t) {
-    const rows = [], jobs = [];
-    let r = [], c = "", q = false;
-    for (let i = 0; i < t.length; i++) {
-        const ch = t[i], nx = t[i + 1];
-        if (ch === '"') {
-            if (q && nx === '"') { c += '"'; i++; }
-            else { q = !q; }
-        } else if (ch === ',' && !q) {
-            r.push(c); c = "";
-        } else if (ch === '\n' && !q) {
-            r.push(c); rows.push(r); r = []; c = "";
-        } else if (ch !== '\r' || q) {
-            c += ch;
-        }
+    const rows=[],jobs=[];let r=[],c="",q=false;
+    for(let i=0;i<t.length;i++){
+        const ch=t[i],nx=t[i+1];
+        if(ch==='"'){if(q&&nx==='"'){c+='"';i++;}else{q=!q;}}
+        else if(ch===','&&!q){r.push(c);c="";}
+        else if(ch==='\n'&&!q){r.push(c);rows.push(r);r=[];c="";}
+        else if(ch!=='\r'||q){c+=ch;}
     }
-    if (r.length || c) { r.push(c); rows.push(r); }
+    if(r.length||c){r.push(c);rows.push(r);}
+    
     const cl = (s) => s ? s.trim() : "";
-    for(let i=1; i<rows.length; i++){
-        const c = rows[i];
-        if(!c || !c[0] || !c[1]) continue;
+    for(let i=1;i<rows.length;i++){
+        const rw=rows[i];
+        if(!rw||!rw[0]||!rw[1])continue;
         jobs.push({ 
-            title: cl(c[0]), 
-            studio: cl(c[1]), 
-            location: cl(c[2]||""), 
-            featured: cl(c[8]||"").toLowerCase() === "yes"
+            title: cl(rw[0]), 
+            studio: cl(rw[1]), 
+            location: cl(rw[2]||""), 
+            featured: cl(rw[8]||"").toLowerCase() === "yes"
         });
     }
     return jobs;
