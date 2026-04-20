@@ -99,11 +99,26 @@ client.on('interactionCreate', async interaction => {
 
 // CSV Parser Helper
 function parseCSV(t) {
-    const ls = t.trim().split("\n");
-    const jobs = [];
-    for(let i=1; i<ls.length; i++){
-        const c = csvLine(ls[i]);
-        if(!c[0] || !c[1]) continue;
+    const rows = [], jobs = [];
+    let r = [], c = "", q = false;
+    for (let i = 0; i < t.length; i++) {
+        const ch = t[i], nx = t[i + 1];
+        if (ch === '"') {
+            if (q && nx === '"') { c += '"'; i++; }
+            else { q = !q; }
+        } else if (ch === ',' && !q) {
+            r.push(c); c = "";
+        } else if (ch === '\n' && !q) {
+            r.push(c); rows.push(r); r = []; c = "";
+        } else if (ch !== '\r' || q) {
+            c += ch;
+        }
+    }
+    if (r.length || c) { r.push(c); rows.push(r); }
+    const cl = (s) => s ? s.trim() : "";
+    for(let i=1; i<rows.length; i++){
+        const c = rows[i];
+        if(!c || !c[0] || !c[1]) continue;
         jobs.push({
             title: cl(c[0]), studio: cl(c[1]), location: cl(c[2]||""), 
             type: cl(c[3]||""), mode: cl(c[4]||""), desc: cl(c[5]||""), 
@@ -113,17 +128,6 @@ function parseCSV(t) {
     }
     return jobs;
 }
-function csvLine(l) {
-    const r=[]; let c="", q=false;
-    for(let i=0; i<l.length; i++){
-        const ch=l[i];
-        if(ch==='"') q=!q;
-        else if(ch===',' && !q) { r.push(c); c=""; }
-        else c+=ch;
-    }
-    r.push(c); return r;
-}
-function cl(s) { return s.replace(/^"|"$/g,"").trim(); }
 
 async function pollJobs() {
     console.log("Polling for new jobs...");
