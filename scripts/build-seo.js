@@ -77,8 +77,9 @@ function parseCSV(t) {
         const rw=rows[i];
         const status = cell(rw, ['status']);
         const linkStatus = cell(rw, ['link_status']);
+        const featured = cell(rw, ['Featured', '(Featured)'], 8).toLowerCase() === "yes";
         if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
-        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(hkey(linkStatus))) continue;
+        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(hkey(linkStatus)) && !featured) continue;
         const title = cell(rw, ['Job Title', 'title'], 0);
         const studio = cell(rw, ['Studio Name', 'studio'], 1);
         const id = cell(rw, ['job_id']);
@@ -94,7 +95,7 @@ function parseCSV(t) {
             studio,
             location,
             desc: cell(rw, ['Description', 'desc'], 5),
-            featured: cell(rw, ['Featured', '(Featured)'], 8).toLowerCase() === "yes"
+            featured
         });
     }
     return jobs;
