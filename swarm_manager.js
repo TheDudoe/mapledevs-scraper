@@ -21,16 +21,22 @@ async function runSwarm(options = {}) {
         const reviewResult = await reviewer();
 
         // Phase 3: Writing (Author)
+        await new Promise(r => setTimeout(r, 10000));
         const draft = await author(findings);
+        console.log(`[Manager] Polisher generated draft for: ${draft?.title}`);
+        if (!draft) return;
 
         // Phase 4: SEO (Optimizer)
+        await new Promise(r => setTimeout(r, 10000));
         const optimizedBlog = await optimizer(draft);
+        console.log(`[Manager] Optimizer generated slug: ${optimizedBlog?.slug}`);
 
         // Phase 5: Publishing (Director)
+        await new Promise(r => setTimeout(r, 10000));
         if (!options.dryRun) {
             await director({
                 blog: optimizedBlog,
-                approvedCount: reviewResult.approvedCount
+                approvedCount: reviewResult?.approvedCount || 0
             });
             console.log('✅ Swarm cycle complete. Website updated.');
         } else {

@@ -42,43 +42,41 @@ async function updateAgent(id, status, lastAction) {
 /**
  * Initialize Gemini
  */
-function getGemini(modelName = 'gemini-1.5-flash') {
+function getGemini(modelName = 'gemini-2.0-flash') {
     const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey) {
         throw new Error('MISSING_API_KEY: Please set GOOGLE_API_KEY in your .env file.');
     }
     const genAI = new GoogleGenerativeAI(apiKey);
-    return genAI.getGenerativeModel({ model: modelName });
+    return genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
 }
 
 /**
  * Generic AI call with retry and fallback logic
  */
-async function askAI(agentName, prompt, model = 'gemini-2.5-flash') {
-    const modelsToTry = [model, 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
+async function askAI(agentName, prompt, model = 'gemini-2.0-flash') {
+    const modelsToTry = [model, 'gemini-2.5-flash', 'gemini-pro-latest', 'gemini-2.0-flash-001'];
     let lastError;
 
     for (const modelName of modelsToTry) {
         try {
-            console.log(`[${agentName}] Attempting with model: ${modelName}`);
             const genModel = getGemini(modelName);
             const result = await genModel.generateContent(prompt);
             return result.response.text();
         } catch (error) {
+            console.error(`[AI Error] ${modelName}:`, error.message);
             lastError = error;
             if (error.message.includes('API key expired') || error.message.includes('API_KEY_INVALID')) {
-                throw error; // Don't bother retrying if the key itself is the problem
+                throw error;
             }
-            console.warn(`[${agentName}] Model ${modelName} failed, trying next...`);
         }
     }
-    
-    console.error(`[${agentName}] All models failed.`);
+
     throw lastError;
 }
 
 /**
- * Initialize Google Sheets API
+ * Google Sheets Authentication
  */
 async function getSheets() {
     const { google } = require('googleapis');
@@ -122,6 +120,5 @@ module.exports = {
     updateState,
     updateAgent,
     askAI,
-    getSheets,
-    STATE_PATH
+    getSheets
 };

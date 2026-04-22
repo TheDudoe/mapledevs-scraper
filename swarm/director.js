@@ -2,74 +2,36 @@ const fs = require('fs-extra');
 const path = require('path');
 const { updateState, updateAgent } = require('./utils');
 
+/**
+ * Publisher Agent
+ * Takes polished JSON content and injects it into the site template.
+ */
 async function publish(contentPackage) {
     const agentId = 'director';
-    // Internal status only - not shown to users
-    await updateAgent(agentId, 'Active', 'Finalizing editorial...');
+    await updateAgent(agentId, 'Active', 'Publishing to template...');
 
     const ROOT_DIR = path.join(__dirname, '..');
     const BLOG_DIR = path.join(ROOT_DIR, 'blog');
 
     try {
         if (contentPackage.blog) {
-            const { slug, final_markdown } = contentPackage.blog;
-            const postDir = path.join(BLOG_DIR, slug);
-            await fs.ensureDir(postDir);
-
-            // Save the markdown
-            await fs.writeFile(path.join(postDir, 'content.md'), final_markdown);
+            // contentPackage.blog is expected to be { slug, meta_description, html_body, title }
+            const { slug, meta_description, html_body, title } = contentPackage.blog;
             
-            // 1. Create a HUMAN-STYLED index.html that matches MapleDevs theme
-            const titleMatch = final_markdown.match(/^# (.*)/m) || final_markdown.match(/title: "(.*)"/);
-            const title = titleMatch ? titleMatch[1] : 'Industry Update';
-            const cleanBody = final_markdown.replace(/^---[\s\S]*?---/, '').replace(/^# .*/, '').trim();
-            const htmlContent = cleanBody.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-
-            const blogHtml = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title} | MapleDevs Editorial</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --maple: #ff4d4d;
-            --maple-gradient: linear-gradient(135deg, #ff4d4d 0%, #b30000 100%);
-            --bg: #0a0b10;
-            --text: #e0e0e6;
-            --text-dim: #9494a3;
-        }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
-        header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; margin-bottom: 40px; }
-        h1 { font-size: 42px; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
-        .back { color: var(--maple); text-decoration: none; font-size: 14px; display: block; margin-bottom: 20px; font-weight: 600; }
-        .content p { margin-bottom: 24px; font-size: 18px; color: #ced4da; }
-        .content h3 { color: #fff; margin-top: 40px; border-left: 3px solid var(--maple); padding-left: 15px; }
-        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); font-size: 14px; text-align: center; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="/blog/" class="back">← Back to The Maple Feed</a>
-        <header>
-            <h1>${title}</h1>
-            <div style="color: var(--text-dim);">MapleDevs Editorial Team • April 2026</div>
-        </header>
-        <div class="content">
-            ${htmlContent}
-        </div>
-        <footer>
-            &copy; 2026 MapleDevs. Verified Canadian Game Industry News.
-        </footer>
-    </div>
-</body>
-</html>`;
-            await fs.writeFile(path.join(postDir, 'index.html'), blogHtml);
+            // 1. Template Injection
+            const templatePath = path.join(ROOT_DIR, 'blog-template.html');
+            if (!await fs.pathExists(templatePath)) throw new Error('MISSING_TEMPLATE: blog-template.html not found.');
             
-            // 2. Update Ticker (Safe Marker Logic)
+            let html = await fs.readFile(templatePath, 'utf-8');
+            html = html.replace('{{TITLE}}', title || 'Industry Update');
+            html = html.replace('{{META_DESCRIPTION}}', meta_description || '');
+            html = html.replace('{{CONTENT}}', html_body);
+
+            // 2. Strict Routing (Flat file in /blog/)
+            const filePath = path.join(BLOG_DIR, `${slug}.html`);
+            await fs.writeFile(filePath, html);
+            
+            // 3. Update Website Ticker
             const indexPath = path.join(ROOT_DIR, 'index.html');
             if (await fs.pathExists(indexPath)) {
                 let indexContent = await fs.readFile(indexPath, 'utf-8');
@@ -77,7 +39,7 @@ async function publish(contentPackage) {
 <div id="news-ticker" class="news-ticker" style="background:var(--maple-gradient); color:#fff; padding:6px 1rem; text-align:center; font-size:12px; font-weight:600; position:relative; z-index:300;">
   <div class="nt-inner" style="max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:8px;">
     <span style="background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:4px; font-size:10px; text-transform:uppercase;">Latest News</span>
-    <a href="/blog/${slug}/" id="latest-news-link" style="color:#fff; text-decoration:none; display:flex; align-items:center; gap:4px;">
+    <a href="/blog/${slug}.html" id="latest-news-link" style="color:#fff; text-decoration:none; display:flex; align-items:center; gap:4px;">
       <span id="latest-news-title">${title}</span>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
@@ -91,35 +53,36 @@ async function publish(contentPackage) {
                 }
             }
 
-            // 3. Update Archive
-            const blogArchivePath = path.join(ROOT_DIR, 'blog', 'index.html');
+            // 4. Update Blog Archive
+            const blogArchivePath = path.join(BLOG_DIR, 'index.html');
             if (await fs.pathExists(blogArchivePath)) {
                 let archiveContent = await fs.readFile(blogArchivePath, 'utf-8');
                 const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 const newCardHtml = `<!-- ═══════ BLOG POSTS START ═══════ -->
-            <a href="/blog/${slug}/" class="blog-card">
+            <a href="/blog/${slug}.html" class="blog-card">
                 <span class="date">${date}</span>
                 <h2>${title}</h2>
-                <p>${title}. Latest updates from the Canadian gaming scene.</p>
+                <p>${meta_description}</p>
             </a>`;
                 if (archiveContent.includes('<!-- ═══════ BLOG POSTS START ═══════ -->')) {
                     archiveContent = archiveContent.replace('<!-- ═══════ BLOG POSTS START ═══════ -->', newCardHtml);
                     await fs.writeFile(blogArchivePath, archiveContent);
                 }
             }
+
+            console.log(`[Publisher] Published: /blog/${slug}.html`);
         }
 
         const state = await fs.readJson(path.join(__dirname, 'state.json'));
         state.stats.blogs_written += contentPackage.blog ? 1 : 0;
-        state.stats.jobs_approved += contentPackage.approvedCount || 0;
         state.last_run = new Date().toISOString();
         state.status = 'idle';
         await updateState(state);
-        await updateAgent(agentId, 'Idle', 'Editorial Complete.');
+        await updateAgent(agentId, 'Idle', 'Publisher Complete.');
         
     } catch (error) {
-        console.error('[Director Error]', error);
-        await updateAgent(agentId, 'Idle', 'Editorial Error');
+        console.error('[Publisher Error]', error);
+        await updateAgent(agentId, 'Idle', 'Publisher Error');
         throw error;
     }
 }

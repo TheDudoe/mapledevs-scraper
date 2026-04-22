@@ -9,29 +9,39 @@ async function writeContent(findings) {
         return null;
     }
 
-    const prompt = `
-        You are the Head Writer for MapleDevs. Write a "Weekly Canadian Gaming Round-up" blog post.
-        
-        Use these findings:
-        ${JSON.stringify(findings, null, 2)}
+    const prompt = `You are an expert Canadian Gaming SEO Polisher.
+Take this research and create a high-retention blog post.
+OUTPUT ONLY a valid JSON object with these keys:
+{
+  "slug": "lowercase-hyphenated-slug",
+  "title": "Catchy Industry Title",
+  "meta_description": "SEO optimized description (150 chars)",
+  "html_body": "<h2>Section</h2><p>Content...</p>"
+}
 
-        Guidelines:
-        1. Tone: Professional, optimistic, and deeply Canadian.
-        2. Format: Markdown.
-        3. Structure: 
-           - Catchy Title
-           - Intro summarizing the week.
-           - Section for each major finding.
-           - "What this means for job seekers" section.
-           - Conclusion with a call to action to check MapleDevs.
-        
-        Return the content in Markdown format.
-    `;
+RESEARCH DATA:
+${JSON.stringify(findings, null, 2)}`;
 
     try {
-        const content = await askAI(agentId, prompt, 'gemini-pro');
-        await updateAgent(agentId, 'Idle', 'Blog post draft completed.');
-        return content;
+        const responseText = await askAI(agentId, prompt, 'gemini-pro');
+        
+        // Clean up JSON if model adds markdown blocks
+        const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        try {
+            const polishedJson = JSON.parse(cleanedText);
+            await updateAgent(agentId, 'Idle', `Polished: ${polishedJson.title}`);
+            return polishedJson;
+        } catch (e) {
+            console.error('[Author JSON Error]', e);
+            // Fallback
+            return {
+                slug: 'canadian-gaming-update-' + Date.now(),
+                title: 'Industry News Update',
+                meta_description: 'The latest from the Canadian gaming scene.',
+                html_body: `<p>${responseText}</p>`
+            };
+        }
     } catch (error) {
         await updateAgent(agentId, 'Idle', `Error: ${error.message}`);
         throw error;

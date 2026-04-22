@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}} | MapleDevs Editorial</title>
+    <meta name="description" content="{{META_DESCRIPTION}}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --maple: #ff4d4d;
+            --maple-gradient: linear-gradient(135deg, #ff4d4d 0%, #b30000 100%);
+            --bg: #0a0b10;
+            --text: #e0e0e6;
+            --text-dim: #9494a3;
+        }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
+        header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; margin-bottom: 40px; }
+        h1 { font-size: 42px; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
+        .back { color: var(--maple); text-decoration: none; font-size: 14px; display: block; margin-bottom: 20px; font-weight: 600; }
+        .content p { margin-bottom: 24px; font-size: 18px; color: #ced4da; }
+        .content h2 { color: #fff; margin-top: 40px; border-left: 3px solid var(--maple); padding-left: 15px; font-size: 24px; }
+        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); font-size: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/blog/" class="back">← Back to The Maple Feed</a>
+        <header>
+            <h1>{{TITLE}}</h1>
+            <div style="color: var(--text-dim);">MapleDevs Editorial Team • April 2026</div>
+        </header>
+        <div class="content">
+            {{CONTENT}}
+        </div>
+        <footer>
+            &copy; 2026 MapleDevs. Verified Canadian Game Industry News.
+        </footer>
+    </div>
+</body>
+</html>
