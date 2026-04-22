@@ -5,7 +5,9 @@ const slugify = require('slugify');
 
 const ROOT_DIR = process.cwd();
 const INDEX_PATH = path.join(ROOT_DIR, 'index.html');
-const SHEET_ID = '2PACX-1vSkt2ROoihRVsL4f0m4dXZ1IzD7KYzEghgOwW7QPC2EN6sE4D_iI3stfllfdeq61coOrhdi47eeLmoY';
+const SHEET_DOC_ID = '1L2KcTO32jK5MVY1m3qdqdja7LTZ38f8lYXsK5mNMMDo';
+const LIVE_SHEET_NAME = 'jobs_live';
+const LIVE_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_DOC_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(LIVE_SHEET_NAME)}`;
 
 const SEO_TARGETS = [
     { folder: 'vancouver', hash: '#city=Vancouver', title: 'Vancouver Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Vancouver, BC. No US roles. Salaries, entry-level, and remote roles included.' },
@@ -58,17 +60,41 @@ function parseCSV(t) {
         else if(ch!=='\r'||q){c+=ch;}
     }
     if(r.length||c){r.push(c);rows.push(r);}
-    
+
     const cl = (s) => s ? s.trim() : "";
+    const hkey = (s) => cl(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const header = (rows[0] || []).map(hkey);
+    const cell = (row, names, fallback) => {
+        for (const name of names) {
+            const index = header.indexOf(hkey(name));
+            if (index !== -1) return cl(row[index]);
+        }
+        return fallback !== undefined ? cl(row[fallback]) : "";
+    };
+
+    const seen = new Set();
     for(let i=1;i<rows.length;i++){
         const rw=rows[i];
-        if(!rw||!rw[0]||!rw[1])continue;
-        jobs.push({ 
-            title: cl(rw[0]), 
-            studio: cl(rw[1]), 
-            location: cl(rw[2]||""), 
-            desc: cl(rw[5]||""),
-            featured: cl(rw[8]||"").toLowerCase() === "yes"
+        const status = cell(rw, ['status']);
+        const linkStatus = cell(rw, ['link_status']);
+        if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
+        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(hkey(linkStatus))) continue;
+        const title = cell(rw, ['Job Title', 'title'], 0);
+        const studio = cell(rw, ['Studio Name', 'studio'], 1);
+        const id = cell(rw, ['job_id']);
+        const apply = cell(rw, ['How to Apply', 'Apply URL', 'apply'], 6);
+        const location = cell(rw, ['Location'], 2);
+        if(!rw||!title||!studio)continue;
+        const key = hkey(`${title}|${studio}|${location}`);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        jobs.push({
+            id,
+            title,
+            studio,
+            location,
+            desc: cell(rw, ['Description', 'desc'], 5),
+            featured: cell(rw, ['Featured', '(Featured)'], 8).toLowerCase() === "yes"
         });
     }
     return jobs;
@@ -82,10 +108,10 @@ function safeReplaceMeta(html, propertyOrName, newValue, isProperty = true) {
 
 function injectSEO(html, target, targetJobs = []) {
     let output = html;
-    
+
     // 1. Clean up potential artifacts
     output = output.replace(/^[^{]*\{[^{}]*"@context":[^{}]*\}/s, '');
-    
+
     // 2. Head Tags
     output = output.replace(/<title>.*?<\/title>/i, `<title>${target.title}</title>`);
     output = safeReplaceMeta(output, 'description', target.desc, false);
@@ -93,11 +119,11 @@ function injectSEO(html, target, targetJobs = []) {
     output = safeReplaceMeta(output, 'og:description', target.desc, true);
     output = safeReplaceMeta(output, 'og:url', `https://mapledevs.ca/${target.folder}/`, true);
     output = output.replace(/<link rel="canonical" href="[^"]*"/i, `<link rel="canonical" href="https://mapledevs.ca/${target.folder}/"`);
-    
+
     // 3. Redirect / Deep Link Hash (for SPA fallback)
     const redirectScript = `\n    <script>if(!window.location.hash) window.location.hash = '${target.hash}';</script>\n`;
     output = output.replace('<head>', '<head>' + redirectScript);
-    
+
     // 4. STATIC INJECTION (The "Fortress" of SEO)
     // We replace the skeleton list with actual HTML for search engines
     if (targetJobs.length > 0) {
@@ -109,7 +135,7 @@ function injectSEO(html, target, targetJobs = []) {
                 <div style="font-size:0.85rem; margin-top:0.5rem; color:#444;">${j.desc}</div>
             </div>
         `).join('');
-        
+
         const jobListRegex = /<div id="job-list">[\s\S]*?<\/div>/;
         output = output.replace(jobListRegex, `<div id="job-list">${jobsHtml}</div>`);
     }
@@ -131,7 +157,7 @@ function injectSEO(html, target, targetJobs = []) {
         const hubDivRegex = /<div id="hub-highlights" class="hub-highlights"><\/div>/;
         output = output.replace(hubDivRegex, ctxHtml);
     }
-    
+
     if (target.title_fr) {
         output = output.replace('</h1>', `</h1><h2 style="font-size:1.2rem; color:#666; margin-top:-0.5rem;">${target.title_fr}</h2>`);
     }
@@ -164,7 +190,7 @@ async function build() {
         if (docTypeIdx !== -1) baseHTML = baseHTML.substring(docTypeIdx);
     }
 
-    const csvData = await fetchURL(`https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`);
+    const csvData = await fetchURL(LIVE_CSV_URL);
     const jobs = parseCSV(csvData);
 
     let sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://mapledevs.ca/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`;
@@ -177,7 +203,7 @@ async function build() {
         let targetJobs = [];
         const h = target.hash.replace('#','');
         const p = new URLSearchParams(h);
-        
+
         if (p.has('city')) targetJobs = jobs.filter(j => j.location.toLowerCase().includes(p.get('city').toLowerCase()));
         else if (p.has('role')) {
             const ro = p.get('role');
@@ -191,13 +217,14 @@ async function build() {
         }
         else if (p.has('mode')) targetJobs = jobs.filter(j => j.location.toLowerCase().includes('remote') || j.title.toLowerCase().includes('remote')); // simplified
         else if (p.has('type')) targetJobs = jobs.filter(j => j.title.toLowerCase().includes(p.get('type').toLowerCase()));
-        
+
         const html = injectSEO(baseHTML, target, targetJobs.slice(0, 10)); // Top 10 for SEO
         fs.writeFileSync(path.join(targetDir, 'index.html'), html);
         sitemapXML += `\n  <url><loc>https://mapledevs.ca/${target.folder}/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`;
     }
 
     const jobsDir = path.join(ROOT_DIR, 'jobs');
+    fs.rmSync(jobsDir, { recursive: true, force: true });
     if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir);
 
     for (const job of jobs) {
