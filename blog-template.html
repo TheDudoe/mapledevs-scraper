@@ -6,37 +6,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{TITLE}} | MapleDevs Editorial</title>
     <meta name="description" content="{{META_DESCRIPTION}}">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Using MapleDevs Branded Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --maple: #ff4d4d;
-            --maple-gradient: linear-gradient(135deg, #ff4d4d 0%, #b30000 100%);
-            --bg: #0a0b10;
-            --text: #e0e0e6;
-            --text-dim: #9494a3;
+            --maple: #C8372D;
+            --maple-dark: #A02820;
+            --maple-gradient: linear-gradient(135deg, #C8372D 0%, #E8564C 100%);
+            --bg: #F8F7F4;
+            --text: #111110;
+            --text-dim: #4A4A45;
+            --border: rgba(17, 17, 16, 0.07);
         }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
-        header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; margin-bottom: 40px; }
-        h1 { font-size: 42px; color: #fff; margin-bottom: 10px; letter-spacing: -1px; }
-        .back { color: var(--maple); text-decoration: none; font-size: 14px; display: block; margin-bottom: 20px; font-weight: 600; }
-        .content p { margin-bottom: 24px; font-size: 18px; color: #ced4da; }
-        .content h2 { color: #fff; margin-top: 40px; border-left: 3px solid var(--maple); padding-left: 15px; font-size: 24px; }
-        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); font-size: 14px; text-align: center; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.7; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .container { max-width: 760px; margin: 0 auto; padding: 60px 24px; }
+        
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        
+        .back-link { 
+            color: var(--maple); 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 600; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        header { 
+            margin-bottom: 48px; 
+        }
+        
+        h1 { 
+            font-family: 'DM Serif Display', serif;
+            font-size: 42px; 
+            color: var(--text); 
+            margin: 0 0 16px 0; 
+            line-height: 1.15;
+            font-weight: 400;
+        }
+        
+        .metadata {
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .article-content { 
+            font-size: 18px; 
+            color: var(--text-2);
+        }
+        
+        .article-content p { margin-bottom: 24px; }
+        
+        .article-content h2 { 
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px; 
+            color: var(--text); 
+            margin: 48px 0 20px 0; 
+            font-weight: 400;
+        }
+        
+        .article-content a { color: var(--maple); text-decoration: underline; }
+
+        .sources {
+            margin-top: 60px;
+            padding: 32px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        
+        .sources h3 { margin-top: 0; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        .sources ul { padding-left: 20px; margin: 0; }
+        .sources li { font-size: 14px; color: var(--text-dim); margin-bottom: 8px; }
+
+        footer { 
+            margin-top: 80px; 
+            padding-top: 32px; 
+            border-top: 1px solid var(--border); 
+            color: var(--text-dim); 
+            font-size: 13px; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/blog/" class="back">← Back to The Maple Feed</a>
+        <div class="nav-header">
+            <a href="/blog/index.html" class="back-link">← Back to The Maple Feed</a>
+            <img src="/favicon.png" alt="MapleDevs" style="height: 20px;">
+        </div>
+
         <header>
             <h1>{{TITLE}}</h1>
-            <div style="color: var(--text-dim);">MapleDevs Editorial Team • April 2026</div>
+            <div class="metadata">
+                <span style="color: var(--maple)">MapleDevs Editorial</span>
+                <span>•</span>
+                <span>{{DATE}}</span>
+            </div>
         </header>
-        <div class="content">
+
+        <article class="article-content">
             {{CONTENT}}
-        </div>
-        <footer>
-            &copy; 2026 MapleDevs. Verified Canadian Game Industry News.
+        </article>
+
+        <footer id="editorial-footer">
+            &copy; 2026 MapleDevs. Verified Canadian Game Industry Insights.
         </footer>
     </div>
 </body>
