@@ -965,6 +965,19 @@ function objectToRow(record, headers) {
   });
 }
 
+function isYes(value) {
+  return ['yes', 'true', '1'].includes(String(value || '').trim().toLowerCase());
+}
+
+function mergeOwnerControlledFields(baseRecord, ownerRecord) {
+  if (!ownerRecord) return baseRecord;
+  const next = { ...baseRecord };
+  for (const key of ['featured']) {
+    if (ownerRecord[key]) next[key] = ownerRecord[key];
+  }
+  return next;
+}
+
 async function ensureSheet(sheets, spreadsheetId, title) {
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
   const existing = meta.data.sheets.find(s => s.properties.title === title);
@@ -1107,7 +1120,7 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
     const jobId = reviewEntry.object.job_id;
     const sourceRecord = records.find(r => r.job_id === jobId) || reviewEntry.object;
     const liveRecord = {
-      ...sourceRecord,
+      ...mergeOwnerControlledFields(sourceRecord, liveIndex.get(jobId)?.object),
       ...reviewEntry.object,
       status: 'approved',
       link_status: scrapedIds.has(jobId) ? 'active' : (reviewEntry.object.link_status || 'active'),
@@ -1129,6 +1142,7 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
 
   for (const [jobId, liveEntry] of liveIndex.entries()) {
     if (scrapedIds.has(jobId)) continue;
+    if (isYes(liveEntry.object.featured)) continue;
     await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, liveEntry.rowNumber, objectToRow({
       ...liveEntry.object,
       status: 'expired',

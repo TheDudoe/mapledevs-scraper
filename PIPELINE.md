@@ -38,6 +38,17 @@ scraper -> jobs_raw -> jobs_review -> jobs_live -> website
 6. Run the workflow again, or wait for the next scheduled run.
 7. Approved jobs will appear in `jobs_live`, then on the website.
 
+## Featured Jobs
+
+Use the `(Featured)` column in `jobs_review`.
+
+- Set `(Featured)` to `Yes` to feature a job.
+- Set `(Featured)` to `No` or leave it blank for a normal job.
+- The scraper treats this as an owner-controlled field.
+- If a featured job is already in `jobs_live`, the scraper will not expire/remove it just because it disappeared from the scraped source.
+
+For paid/manual featured listings, create or edit the row in `jobs_review`, set `status` to `approved`, and set `(Featured)` to `Yes`.
+
 ## Why This Prevents Duplicates
 
 Each scraped job gets a stable `job_id`.
