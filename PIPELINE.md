@@ -40,14 +40,31 @@ scraper -> jobs_raw -> jobs_review -> jobs_live -> website
 
 ## Featured Jobs
 
-Use the `(Featured)` column in `jobs_review`.
+Use the `feature` column in `jobs_review` if your sheet uses lowercase headers.
+The code also supports the older `(Featured)` column name.
 
-- Set `(Featured)` to `Yes` to feature a job.
-- Set `(Featured)` to `No` or leave it blank for a normal job.
+- Set `feature` to `Yes` to feature a job.
+- Set `feature` to `No` or leave it blank for a normal job.
 - The scraper treats this as an owner-controlled field.
 - If a featured job is already in `jobs_live`, the scraper will not expire/remove it just because it disappeared from the scraped source.
 
-For paid/manual featured listings, create or edit the row in `jobs_review`, set `status` to `approved`, and set `(Featured)` to `Yes`.
+For paid/manual featured listings, create or edit the row in `jobs_review`, set `status` to `approved`, and set `feature` to `Yes`.
+
+## Data-Only Helper Fields
+
+These fields are for the pipeline and should not be shown as visible job details on the website:
+
+- `job_id`
+- `source_url`
+- `last_verified_at`
+- `status`
+- `tags`
+- `link_status`
+- `first_seen_at`
+- `last_seen_at`
+- `scraped_at`
+- `notes`
+- `date_reviewed`
 
 ## Why This Prevents Duplicates
 

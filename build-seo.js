@@ -77,13 +77,13 @@ function parseCSV(t) {
         const rw=rows[i];
         const status = cell(rw, ['status']);
         const linkStatus = cell(rw, ['link_status']);
-        const featured = cell(rw, ['Featured', '(Featured)'], 8).toLowerCase() === "yes";
+        const featured = cell(rw, ['feature', 'Featured', '(Featured)'], 8).toLowerCase() === "yes";
         if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
         if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(hkey(linkStatus)) && !featured) continue;
         const title = cell(rw, ['Job Title', 'title'], 0);
         const studio = cell(rw, ['Studio Name', 'studio'], 1);
         const id = cell(rw, ['job_id']);
-        const apply = cell(rw, ['How to Apply', 'Apply URL', 'apply'], 6);
+        const apply = cell(rw, ['How to Apply', 'Apply URL', 'apply', 'source_url'], 6);
         const location = cell(rw, ['Location'], 2);
         if(!rw||!title||!studio)continue;
         const key = hkey(`${title}|${studio}|${location}`);

@@ -887,7 +887,12 @@ const PIPELINE_HEADERS = [
   'first_seen_at',
   'last_seen_at',
   'last_verified_at',
+  'source_url',
   'source_id',
+  'scraped_at',
+  'notes',
+  'date_reviewed',
+  'tags',
 ];
 
 function normalizeKey(value) {
@@ -938,7 +943,12 @@ function jobToRecord(job, now) {
     first_seen_at: now,
     last_seen_at: now,
     last_verified_at: now,
+    source_url: job.applyUrl || '',
     source_id: job.sourceId || '',
+    scraped_at: now,
+    notes: '',
+    date_reviewed: '',
+    tags: '',
   };
 }
 
@@ -955,7 +965,9 @@ function objectToRow(record, headers) {
     title: 'job_title',
     studio: 'studio_name',
     apply_url: 'how_to_apply',
+    source_url: 'how_to_apply',
     posted: 'date_posted',
+    feature: 'featured',
     student: 'student_friendly',
     visa: 'visa_sponsorship',
   };
