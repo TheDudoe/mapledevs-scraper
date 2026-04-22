@@ -34,7 +34,7 @@ async function publish(contentPackage) {
 
                 // Replace title and link
                 indexContent = indexContent.replace(/id="latest-news-title">.*?<\/span>/, `id="latest-news-title">${title}</span>`);
-                indexContent = indexContent.replace(/id="latest-news-link" href=".*?"/, `id="latest-news-link" href="/blog/${slug}"`);
+                indexContent = indexContent.replace(/id="latest-news-link" href=".*?"/, `id="latest-news-link" href="/blog/${slug}/"`);
                 
                 await fs.writeFile(indexPath, indexContent);
                 console.log(`[Director] Updated website ticker with: ${title}`);
