@@ -256,8 +256,8 @@
                 MapleDevs <span>Swarm</span>
             </div>
             <div class="status-badge">
-                <div class="pulse"></div>
-                System Operational
+                <div class="pulse" id="system-status-dot"></div>
+                <span id="system-status-text">System Operational</span>
             </div>
         </header>
 
@@ -375,7 +375,11 @@
         async function updateDashboard() {
             try {
                 const response = await fetch('../swarm/state.json?t=' + Date.now());
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                
                 const state = await response.json();
+                document.getElementById('system-status-text').innerText = 'System Operational';
+                document.getElementById('system-status-dot').style.background = 'var(--success)';
                 
                 // Update Stats
                 document.getElementById('stat-jobs').innerText = state.stats.jobs_processed;
@@ -417,6 +421,8 @@
 
             } catch (error) {
                 console.error('Failed to fetch state:', error);
+                document.getElementById('system-status-text').innerText = 'Connection Error';
+                document.getElementById('system-status-dot').style.background = '#ff4444';
             }
         }
 
