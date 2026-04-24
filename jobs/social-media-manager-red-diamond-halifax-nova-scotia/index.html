@@ -1132,6 +1132,277 @@ header::after { display: none; }
 
 .market-list b { color: #9fe0d1; font-size: 12px; white-space: nowrap; }
 
+.signal-engine {
+  position: relative;
+  min-height: 190px;
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(159,224,209,0.22), transparent 7%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), transparent 36%),
+    rgba(255,255,255,0.05);
+}
+.signal-engine::before,
+.signal-engine::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 1px solid rgba(159,224,209,0.18);
+  border-radius: 50%;
+}
+.signal-engine::after {
+  inset: 48px;
+  border-color: rgba(216,59,46,0.24);
+}
+.signal-sweep {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48%;
+  height: 2px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(159,224,209,0.85), transparent);
+  animation: signalSweep 6s linear infinite;
+}
+.signal-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 66px;
+  height: 66px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(159,224,209,0.34);
+  border-radius: 50%;
+  background: rgba(17,24,32,0.78);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 850;
+  box-shadow: 0 0 36px rgba(159,224,209,0.16);
+}
+.signal-node {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--r-s);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.86);
+  font-size: 11px;
+  font-weight: 750;
+  backdrop-filter: blur(10px);
+  animation: signalFloat 5s ease-in-out infinite;
+}
+.signal-node::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9fe0d1;
+  box-shadow: 0 0 12px rgba(159,224,209,0.8);
+}
+.signal-node.n1 { left: 18px; top: 22px; }
+.signal-node.n2 { right: 16px; top: 46px; animation-delay: -1.2s; }
+.signal-node.n3 { left: 30px; bottom: 26px; animation-delay: -2.2s; }
+.signal-node.n4 { right: 34px; bottom: 18px; animation-delay: -3.2s; }
+@keyframes signalSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes signalFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.intelligence-s,
+.proof-wall-s {
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+  padding: 2.7rem 1.5rem;
+}
+.section-shell {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.section-headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.section-headline h2 {
+  max-width: 720px;
+  color: var(--text-1);
+  font-size: clamp(1.7rem, 3vw, 2.55rem);
+  line-height: 1.04;
+  margin: 0;
+}
+.section-headline p {
+  max-width: 440px;
+  color: var(--text-3);
+  font-size: 14px;
+  margin: 0;
+}
+.intelligence-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 12px;
+}
+.ops-panel,
+.signal-card,
+.community-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-s);
+}
+.ops-panel {
+  padding: 18px;
+}
+.ops-panel h3,
+.community-panel h3 {
+  margin: 0 0 8px;
+  color: var(--text-1);
+  font-size: 18px;
+}
+.pipeline {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+.pipe-step {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 64px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-body);
+  padding: 10px 12px;
+}
+.pipe-step b {
+  color: var(--text-1);
+  font-size: 14px;
+}
+.pipe-step span {
+  color: var(--text-3);
+  font-size: 12px;
+}
+.pipe-num {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-s);
+  background: #111820;
+  color: #fff;
+  font-weight: 850;
+}
+.pipe-status {
+  color: var(--forest);
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+.signal-card-grid {
+  display: grid;
+  gap: 12px;
+}
+.signal-card {
+  min-height: 126px;
+  padding: 16px;
+}
+.signal-card .k {
+  display: block;
+  color: var(--maple);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.signal-card strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.signal-card p {
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+}
+.proof-wall {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.community-panel {
+  padding: 18px;
+}
+.community-panel p {
+  color: var(--text-3);
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+.community-panel .quote-label {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border: 1px solid rgba(216,59,46,0.22);
+  border-radius: var(--r-s);
+  background: var(--maple-glow);
+  color: var(--maple);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 14px;
+}
+.community-panel.featured {
+  background:
+    linear-gradient(135deg, rgba(216,59,46,0.08), transparent 44%),
+    var(--bg-card);
+}
+.community-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.community-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: var(--r-s);
+  padding: 0 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 750;
+}
+.community-actions .primary {
+  background: var(--maple);
+  color: #fff;
+}
+.community-actions .secondary {
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  background: var(--bg-subtle);
+}
+
 .trusted {
   background: var(--bg-body);
   padding: 1rem 1.5rem;
@@ -1440,7 +1711,9 @@ select {
 
 @media (max-width: 1050px) {
   .hero-inner,
-  .feed-grid { grid-template-columns: 1fr; }
+  .feed-grid,
+  .intelligence-grid,
+  .proof-wall { grid-template-columns: 1fr; }
   .hero-panel { max-width: 760px; }
   .ctrl-inner { grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(120px, 1fr)); }
 }
@@ -1453,6 +1726,11 @@ select {
   .hero-stats > div { min-width: 0; flex: 1; }
   .feed-s { padding: 2rem 1rem; }
   .feed-head { align-items: flex-start; flex-direction: column; }
+  .section-headline { align-items: flex-start; flex-direction: column; }
+  .intelligence-s,
+  .proof-wall-s { padding: 2rem 1rem; }
+  .pipe-step { grid-template-columns: 36px minmax(0, 1fr); }
+  .pipe-status { grid-column: 2; }
   .controls { position: relative; top: 0; padding: 1rem; }
   .ctrl-inner { display: flex; flex-direction: column; }
   .jc { grid-template-columns: 1fr; }
@@ -1667,6 +1945,14 @@ select {
           <a href="/programming/"><span>Programming and engine roles</span><b>Explore</b></a>
           <span><span>Featured listing price</span><b>$29 CAD</b></span>
         </div>
+        <div class="signal-engine" aria-label="Animated hiring signal visualization">
+          <span class="signal-sweep"></span>
+          <span class="signal-core">LIVE</span>
+          <span class="signal-node n1">salary</span>
+          <span class="signal-node n2">engine</span>
+          <span class="signal-node n3">visa</span>
+          <span class="signal-node n4">remote</span>
+        </div>
       </aside>
     </div>
   </section>
@@ -1773,6 +2059,62 @@ select {
       <div class="proof-item"><b>Official application links</b><span>Roles point candidates to studio career pages or direct hiring contacts.</span></div>
       <div class="proof-item"><b>Useful job details</b><span>Salary, engine, work mode, visa, and student-friendly data are surfaced when available.</span></div>
       <div class="proof-item"><b>No account required</b><span>Save jobs locally and apply directly without a MapleDevs login.</span></div>
+    </div>
+  </section>
+
+  <section class="intelligence-s" aria-label="MapleDevs platform intelligence">
+    <div class="section-shell">
+      <div class="section-headline">
+        <h2>Built like an industry intelligence layer, not just a list of links.</h2>
+        <p>MapleDevs can become the place candidates check before LinkedIn because it explains the role, the studio, and the market context in one fast workflow.</p>
+      </div>
+      <div class="intelligence-grid">
+        <div class="ops-panel">
+          <h3>Signal pipeline</h3>
+          <p style="color:var(--text-3);font-size:14px;margin:0;">A premium job board earns trust by showing how listings become useful, not by looking loud.</p>
+          <div class="pipeline">
+            <div class="pipe-step"><span class="pipe-num">1</span><div><b>Source</b><span>Official studio careers, direct submissions, and curated Canadian roles.</span></div><span class="pipe-status">Tracked</span></div>
+            <div class="pipe-step"><span class="pipe-num">2</span><div><b>Enrich</b><span>Salary, engine, work mode, visa support, student-friendly tags, and regional fit.</span></div><span class="pipe-status">Tagged</span></div>
+            <div class="pipe-step"><span class="pipe-num">3</span><div><b>Publish</b><span>Fast static pages, SEO hubs, job detail schema, and direct apply paths.</span></div><span class="pipe-status">Live</span></div>
+            <div class="pipe-step"><span class="pipe-num">4</span><div><b>Return</b><span>Maple Feed turns hiring news and market changes into a reason to come back weekly.</span></div><span class="pipe-status">Growing</span></div>
+          </div>
+        </div>
+        <div class="signal-card-grid">
+          <div class="signal-card"><span class="k">Search quality</span><strong id="premium-role-count">0</strong><p>Open roles can be filtered by candidate-critical details, not generic job-board categories.</p></div>
+          <div class="signal-card"><span class="k">Studio coverage</span><strong id="premium-studio-count">0</strong><p>Studio names become discovery paths for candidates comparing teams and career pages.</p></div>
+          <div class="signal-card"><span class="k">Regional SEO</span><strong id="premium-city-count">0</strong><p>City hubs help MapleDevs compete for high-intent Canadian search traffic.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof-wall-s" aria-label="MapleDevs proof and community trust">
+    <div class="section-shell">
+      <div class="section-headline">
+        <h2>Proof without fake testimonials.</h2>
+        <p>Real trust beats made-up quotes. This section is ready for candidate and studio testimonials once you collect them, while still communicating value today.</p>
+      </div>
+      <div class="proof-wall">
+        <div class="community-panel featured">
+          <span class="quote-label">Candidate promise</span>
+          <h3>Find the roles that actually fit.</h3>
+          <p>MapleDevs highlights the details candidates normally have to hunt for: salary, engine stack, work mode, visa support, student-friendly status, and Canadian location.</p>
+        </div>
+        <div class="community-panel">
+          <span class="quote-label">Studio promise</span>
+          <h3>Reach people who already want Canadian game jobs.</h3>
+          <p>Studios get a focused audience without changing monetization: standard listings stay free, and featured placement remains $29 CAD.</p>
+        </div>
+        <div class="community-panel">
+          <span class="quote-label">Collect real quotes</span>
+          <h3>Turn users into visible proof.</h3>
+          <p>Add real candidate wins, studio hiring notes, and student success stories as they arrive. MapleDevs should never need fake social proof.</p>
+          <div class="community-actions">
+            <a class="primary" href="mailto:mapledevsbusiness@gmail.com?subject=MapleDevs%20testimonial">Submit a note</a>
+            <a class="secondary" href="/blog/index.html">Read Maple Feed</a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -2252,7 +2594,8 @@ function parseCSV(t){const rows=[],jobs=[];let r=[],c="",q=false;for(let i=0;i<t
 function cl(s){return s?s.trim():"";}
 function toSlug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
 function initFilters(){const cs=[...new Set(ALL.map(j=>j.location).filter(Boolean))].sort(),s=document.getElementById("f-city");s.innerHTML='<option value="">All cities</option>';cs.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o);});}
-function updateStats(){const jc=ALL.length,sc=new Set(ALL.map(j=>j.studio)).size,cc=new Set(ALL.map(j=>j.location).filter(Boolean)).size;if(!statsAni){statsAni=true;animC(document.getElementById('s-jobs'),jc);animC(document.getElementById('s-studios'),sc);animC(document.getElementById('s-cities'),cc);}}
+function setText(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
+function updateStats(){const jc=ALL.length,sc=new Set(ALL.map(j=>j.studio)).size,cc=new Set(ALL.map(j=>j.location).filter(Boolean)).size;setText('premium-role-count',jc);setText('premium-studio-count',sc);setText('premium-city-count',cc);if(!statsAni){statsAni=true;animC(document.getElementById('s-jobs'),jc);animC(document.getElementById('s-studios'),sc);animC(document.getElementById('s-cities'),cc);}}
 function injectJobSchema(jobs){const jld=jobs.map(j=>({"@context":"https://schema.org/","@type":"JobPosting","title":j.title,"description":j.desc||"Opportunity at "+j.studio,"datePosted":j.posted?new Date(j.posted).toISOString():new Date().toISOString(),"validThrough":new Date(Date.now()+30*24*60*60*1000).toISOString(),"employmentType":j.type?j.type.toUpperCase().replace("-","_"):"FULL_TIME","hiringOrganization":{"@type":"Organization","name":j.studio,"logo":"https://mapledevs.ca/og-image.png"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":j.location||"Canada","addressCountry":"CA"}},"jobLocationType":(j.mode||"").toLowerCase().includes("remote")?"TELECOMMUTE":undefined,"applicantLocationRequirements":(j.mode||"").toLowerCase().includes("remote")?{"@type":"Country","name":"Canada"}:undefined}));const el=document.getElementById("job-schema-dynamic");if(el)el.remove();const s=document.createElement("script");s.id="job-schema-dynamic";s.type="application/ld+json";s.text=JSON.stringify(jld);document.head.appendChild(s);}
 function buildTrusted(){const studios=[...new Set(ALL.map(j=>j.studio))].slice(0,12);const el=document.getElementById('trusted-logos');if(!el)return;el.innerHTML=studios.map(s=>'<span class="trusted-name">'+esc(s)+'</span>').join('');}
 
