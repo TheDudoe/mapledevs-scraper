@@ -135,6 +135,28 @@ function hasVisa(job) {
     return /yes|sponsor|relocation|relocate|lmia/i.test(job.visa || '');
 }
 
+function engineFromText(job) {
+    const text = `${job.title || ''} ${job.desc || ''}`.toLowerCase();
+    if (/unreal|ue5|ue 5/.test(text)) return 'Unreal';
+    if (/unity/.test(text)) return 'Unity';
+    if (/godot/.test(text)) return 'Godot';
+    if (/c\+\+|proprietary|engine programmer/.test(text)) return 'C++ / Proprietary';
+    return '';
+}
+
+function signalScore(job) {
+    let score = 48;
+    if (job.salary) score += 14;
+    if (job.engine || engineFromText(job)) score += 10;
+    if (job.mode) score += 8;
+    if (job.apply) score += 7;
+    if (job.desc && job.desc.length > 140) score += 6;
+    if (job.student) score += 4;
+    if (hasVisa(job)) score += 4;
+    if (job.featured) score += 3;
+    return Math.min(98, score);
+}
+
 function isRemote(job) {
     return /(remote|telecommute)/i.test(`${job.mode || ''} ${job.location || ''}`);
 }
@@ -340,7 +362,7 @@ function staticJobCardHTML(job) {
             <div class="jc-pills">${pills}</div>${descHtml}
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">${escapeHTML(job.salary || 'Salary not listed')}</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>${signalScore(job)}</strong><span>Signal</span></span><span class="jc-salary">${escapeHTML(job.salary || 'Salary not listed')}</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span>${job.posted ? `<span class="jc-date">Posted ${escapeHTML(job.posted)}</span>` : ''}</div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/${slug}/">Details</a></div>
         </aside>

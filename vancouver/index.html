@@ -1429,6 +1429,336 @@ header::after { display: none; }
   background: var(--bg-subtle);
 }
 
+.command-s,
+.fit-s {
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+  padding: 2.6rem 1.5rem;
+}
+.command-shell,
+.fit-shell {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.command-head,
+.fit-shell {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+.command-head {
+  margin-bottom: 1rem;
+}
+.command-head h2,
+.fit-copy h2 {
+  color: var(--text-1);
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  line-height: 1.06;
+  margin: 0;
+}
+.command-head p,
+.fit-copy p {
+  max-width: 520px;
+  color: var(--text-3);
+  font-size: 14px;
+  margin: 6px 0 0;
+}
+.command-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr 0.85fr;
+  gap: 12px;
+}
+.command-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  background: var(--bg-card);
+  padding: 18px;
+  box-shadow: var(--shadow-s);
+}
+.command-panel.primary {
+  background:
+    linear-gradient(135deg, rgba(17,24,32,0.94), rgba(28,39,50,0.94)),
+    #111820;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+.command-panel.primary::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -45% 24%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(159,224,209,0.24), transparent 62%);
+  pointer-events: none;
+}
+.panel-k {
+  color: var(--maple);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.command-panel.primary .panel-k { color: #9fe0d1; }
+.command-panel h3 {
+  color: inherit;
+  font-size: 20px;
+  line-height: 1.16;
+  margin: 8px 0 10px;
+}
+.command-panel p {
+  color: var(--text-3);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.command-panel.primary p { color: rgba(255,255,255,0.72); }
+.brief-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+  position: relative;
+  z-index: 1;
+}
+.brief-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--r-s);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.86);
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 750;
+}
+.chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.chart-head span {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 800;
+}
+.chart-head b {
+  color: var(--maple);
+  font-size: 12px;
+}
+.market-bars {
+  display: grid;
+  gap: 10px;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(82px, 0.8fr) minmax(0, 1fr) 34px;
+  gap: 8px;
+  align-items: center;
+  min-height: 26px;
+}
+.bar-label,
+.bar-value {
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 750;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-value {
+  color: var(--text-3);
+  text-align: right;
+}
+.bar-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+}
+.bar-fill {
+  height: 100%;
+  width: var(--w, 0%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--maple), var(--forest-mid));
+}
+.fit-s {
+  padding-top: 1.4rem;
+  padding-bottom: 1.4rem;
+}
+.fit-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.fit-chip {
+  min-height: 38px;
+  border: 1px solid var(--border-s);
+  border-radius: var(--r-s);
+  background: var(--bg-card);
+  color: var(--text-2);
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all var(--dur);
+}
+.fit-chip:hover,
+.fit-chip.active {
+  color: var(--maple);
+  border-color: rgba(200,55,45,0.32);
+  background: var(--maple-glow);
+}
+.feed-brief {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.feed-stat {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg-card);
+  padding: 12px;
+}
+.feed-stat strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.feed-stat span {
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 750;
+}
+.signal-score {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 30px;
+  border: 1px solid rgba(42,92,69,0.16);
+  border-radius: var(--r-s);
+  background: var(--forest-light);
+  color: var(--forest);
+  padding: 0 9px;
+  white-space: nowrap;
+}
+.signal-score strong {
+  font-size: 15px;
+  line-height: 1;
+}
+.signal-score span {
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.compare-btn.on {
+  color: var(--maple) !important;
+  border-color: var(--maple) !important;
+  background: var(--maple-glow) !important;
+}
+.compare-tray {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 420;
+  display: none;
+  width: min(720px, calc(100% - 28px));
+  transform: translateX(-50%);
+  border: 1px solid var(--border-s);
+  border-radius: var(--r-l);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-l);
+  padding: 10px;
+}
+.compare-tray.on {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+.compare-list {
+  display: flex;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+}
+.compare-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  max-width: 190px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-s);
+  background: var(--bg-subtle);
+  color: var(--text-1);
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.compare-pill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.compare-pill button {
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font: inherit;
+}
+.compare-modal {
+  max-width: 960px;
+}
+.compare-table {
+  display: grid;
+  gap: 8px;
+}
+.compare-row {
+  display: grid;
+  grid-template-columns: 150px repeat(var(--cols, 1), minmax(0, 1fr));
+  gap: 8px;
+  align-items: stretch;
+}
+.compare-cell {
+  border: 1px solid var(--border);
+  border-radius: var(--r-s);
+  background: var(--bg-subtle);
+  padding: 10px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+  min-width: 0;
+}
+.compare-cell.label {
+  color: var(--text-3);
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.compare-cell strong {
+  display: block;
+  color: var(--text-1);
+  font-size: 14px;
+  line-height: 1.25;
+}
+.compare-cell a {
+  color: var(--maple);
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .trusted {
   background: var(--bg-body);
   padding: 1rem 1.5rem;
@@ -1664,6 +1994,7 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .jc-salary {
   display: block;
@@ -1738,6 +2069,7 @@ select {
 @media (max-width: 1050px) {
   .hero-inner,
   .feed-grid,
+  .command-grid,
   .intelligence-grid,
   .proof-wall { grid-template-columns: 1fr; }
   .hero-panel { max-width: 760px; }
@@ -1752,6 +2084,12 @@ select {
   .hero-stats > div { min-width: 0; flex: 1; }
   .feed-s { padding: 2rem 1rem; }
   .feed-head { align-items: flex-start; flex-direction: column; }
+  .command-s,
+  .fit-s { padding-left: 1rem; padding-right: 1rem; }
+  .command-head,
+  .fit-shell { align-items: flex-start; flex-direction: column; }
+  .fit-actions { justify-content: flex-start; }
+  .feed-brief { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .section-headline { align-items: flex-start; flex-direction: column; }
   .intelligence-s,
   .proof-wall-s { padding: 2rem 1rem; }
@@ -1769,6 +2107,10 @@ select {
   .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
   .stat-n { font-size: 20px; }
   .stat-l { font-size: 10px; }
+  .feed-brief { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: minmax(68px, 0.7fr) minmax(0, 1fr) 28px; }
+  .compare-tray.on { grid-template-columns: 1fr; }
+  .compare-row { grid-template-columns: 1fr; }
   .feed-grid { gap: 8px; }
   .feed-card { min-height: auto; }
 }
@@ -2009,6 +2351,12 @@ select {
         </div>
         <a class="btn-s" href="/blog/index.html">View all posts</a>
       </div>
+      <div class="feed-brief" id="feed-brief" aria-label="Live Maple Feed brief">
+        <div class="feed-stat"><strong id="feed-fresh-count">0</strong><span>fresh roles this week</span></div>
+        <div class="feed-stat"><strong id="feed-salary-count">0</strong><span>roles with salary data</span></div>
+        <div class="feed-stat"><strong id="feed-engine-count">0</strong><span>engine-tagged roles</span></div>
+        <div class="feed-stat"><strong id="feed-remote-count">0</strong><span>remote or hybrid roles</span></div>
+      </div>
       <div class="feed-grid">
         <a class="feed-card featured-feed" href="/blog/montreal-silicon-valley-north-game-dev-2026.html">
           <div>
@@ -2080,6 +2428,34 @@ select {
     </div>
   </section>
 
+  <section class="command-s" aria-label="MapleDevs market command center">
+    <div class="command-shell">
+      <div class="command-head">
+        <div>
+          <span class="feed-k">Market command center</span>
+          <h2>See where the Canadian game jobs are moving.</h2>
+        </div>
+        <p>Live job data turns into city demand, engine demand, salary visibility, and return-worthy Maple Feed signals.</p>
+      </div>
+      <div class="command-grid">
+        <div class="command-panel primary">
+          <span class="panel-k">Live market brief</span>
+          <h3 id="brief-title">Canadian hiring snapshot</h3>
+          <p id="brief-copy">Loading the latest MapleDevs signals.</p>
+          <div class="brief-chips" id="brief-chips"></div>
+        </div>
+        <div class="command-panel">
+          <div class="chart-head"><span>City demand</span><b id="top-city">Loading</b></div>
+          <div class="market-bars" id="city-bars"></div>
+        </div>
+        <div class="command-panel">
+          <div class="chart-head"><span>Engine demand</span><b id="top-engine">Loading</b></div>
+          <div class="market-bars" id="engine-bars"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="intelligence-s" aria-label="MapleDevs platform intelligence">
     <div class="section-shell">
       <div class="section-headline">
@@ -2132,6 +2508,24 @@ select {
             <a class="secondary" href="/blog/index.html">Read Maple Feed</a>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fit-s" aria-label="Candidate fit console">
+    <div class="fit-shell">
+      <div class="fit-copy">
+        <span class="feed-k">Candidate fit console</span>
+        <h2>Shortlist faster with high-signal presets.</h2>
+        <p>Each preset uses the same verified job fields already powering MapleDevs.</p>
+      </div>
+      <div class="fit-actions">
+        <button class="fit-chip" data-fit="salary" onclick="applyPreset('salary')">Salary listed</button>
+        <button class="fit-chip" data-fit="remote" onclick="applyPreset('remote')">Remote friendly</button>
+        <button class="fit-chip" data-fit="student" onclick="applyPreset('student')">Student path</button>
+        <button class="fit-chip" data-fit="visa" onclick="applyPreset('visa')">Visa support</button>
+        <button class="fit-chip" data-fit="engine" onclick="applyPreset('engine')">Engine roles</button>
+        <button class="fit-chip" data-fit="" onclick="applyPreset('')">Reset</button>
       </div>
     </div>
   </section>
@@ -2194,6 +2588,21 @@ select {
     </div>
   </div>
 
+  <div class="modal-bg" id="compare-modal" onclick="if(event.target===this)closeCompareModal()">
+    <div class="modal compare-modal" role="dialog" aria-labelledby="compare-modal-title">
+      <div class="modal-hdr">
+        <div>
+          <h2 id="compare-modal-title">Compare roles</h2>
+          <p>Salary, engine, visa, work mode, and application paths side by side.</p>
+        </div>
+        <button class="modal-close" onclick="closeCompareModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="compare-table" class="compare-table"></div>
+      </div>
+    </div>
+  </div>
+
   <main id="main-content" role="main">
     <div class="hub-highlights" style="display:block; margin-bottom:1rem; border-left:4px solid #C8372D; padding:1rem; background:#f9f9f9;">
             <h3 style="margin:0 0 0.5rem 0; font-size:1.1rem; color:#C8372D;">Vancouver Studio Guide</h3>
@@ -2209,7 +2618,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Full-time</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$197,654</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>77</strong><span>Signal</span></span><span class="jc-salary">$197,654</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-03-06</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/design-director-battle-pass-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2223,7 +2632,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Full-time</span><span class="pill p-engine">C++ / Proprietary</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$128,848</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>87</strong><span>Signal</span></span><span class="jc-salary">$128,848</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-01-26</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/engine-programmer-core-tech-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2237,7 +2646,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Full-time</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$179,686</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>77</strong><span>Signal</span></span><span class="jc-salary">$179,686</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2025-10-15</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/principal-game-designer-engagement-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2251,7 +2660,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Full-time</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$182,815</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>77</strong><span>Signal</span></span><span class="jc-salary">$182,815</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2025-11-10</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/senior-ai-programmer-special-projects-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2265,7 +2674,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Full-time</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$139,061</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>77</strong><span>Signal</span></span><span class="jc-salary">$139,061</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-02-17</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/senior-systems-designer-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2279,7 +2688,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Internship</span><span class="pill p-stu">Student-friendly</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">$145,844</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>81</strong><span>Signal</span></span><span class="jc-salary">$145,844</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-02-26</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/senior-technical-designer-in-animation-epic-games-vancouver-bc/">Details</a></div>
         </aside>
@@ -2293,7 +2702,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Temporary Full-Time</span></div><p class="jc-desc">Blackbird Interactive is a creative-fueled, future-driven, independent game studio where the best talent in the industry can find long-term careers to help grow their abilities while working on a wide range of projects,...</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">Salary not listed</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>69</strong><span>Signal</span></span><span class="jc-salary">Salary not listed</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-04-08</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/3d-artist-4-month-contract-blackbird-interactive-vancouver-bc/">Details</a></div>
         </aside>
@@ -2307,7 +2716,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Regular Full-Time</span></div><p class="jc-desc">Blackbird Interactive is a creative-fueled, future-driven, independent game studio where the best talent in the industry can find long-term careers to help grow their abilities while working on a wide range of projects,...</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">Salary not listed</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>69</strong><span>Signal</span></span><span class="jc-salary">Salary not listed</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-04-17</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/art-director-blackbird-interactive-vancouver-bc/">Details</a></div>
         </aside>
@@ -2321,7 +2730,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Temporary Full-Time</span></div><p class="jc-desc">Blackbird Interactive is a creative-fueled, future-driven, independent game studio where the best talent in the industry can find long-term careers to help grow their abilities while working on a wide range of projects,...</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">Salary not listed</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>69</strong><span>Signal</span></span><span class="jc-salary">Salary not listed</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-04-14</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/character-artist-8-month-contract-blackbird-interactive-vancouver-bc/">Details</a></div>
         </aside>
@@ -2335,7 +2744,7 @@ select {
             <div class="jc-pills"><span class="pill p-type">Temporary Full-Time</span></div><p class="jc-desc">Blackbird Interactive is a creative-fueled, future-driven, independent game studio where the best talent in the industry can find long-term careers to help grow their abilities while working on a wide range of projects,...</p>
         </div>
         <aside class="jc-side">
-            <div class="jc-side-top"><span class="jc-salary">Salary not listed</span></div>
+            <div class="jc-side-top"><span class="signal-score"><strong>69</strong><span>Signal</span></span><span class="jc-salary">Salary not listed</span></div>
             <div class="jc-foot-main"><span class="jc-verified">Verified listing</span><span class="jc-date">Posted 2026-02-13</span></div>
             <div class="jc-cta-row"><a class="btn-s" href="/jobs/environment-and-prop-artist-8-month-contract-blackbird-interactive-vancouver-bc/">Details</a></div>
         </aside>
@@ -2352,6 +2761,12 @@ select {
 </div>
 
 <!-- ═══════ DETAIL VIEW ═══════ -->
+<div class="compare-tray" id="compare-tray" aria-live="polite">
+  <div class="compare-list" id="compare-list"></div>
+  <button class="btn-s" type="button" onclick="clearCompare()">Clear</button>
+  <button class="btn-p" type="button" onclick="openCompareModal()">Compare</button>
+</div>
+
 <div id="detail-view" class="view" role="main"><main>
   <div id="d-crumbs" class="crumbs"></div>
   <div class="d-card" id="d-content"></div>
@@ -2514,6 +2929,8 @@ const LIVE_SHEET_NAME = "jobs_live";
 const PER_PAGE = 20;
 let ALL = [], dispCount = PER_PAGE;
 let saved = JSON.parse(localStorage.getItem('md_saved')||'[]');
+let compare = JSON.parse(localStorage.getItem('md_compare')||'[]');
+let smartFilter = '';
 
 /* ═══════ DARK MODE ═══════ */
 (function(){
@@ -2746,7 +3163,7 @@ updBadge();
 /* ═══════ DATA ═══════ */
 async function loadJobs(){
   const url="https://docs.google.com/spreadsheets/d/"+SHEET_DOC_ID+"/gviz/tq?tqx=out:csv&sheet="+encodeURIComponent(LIVE_SHEET_NAME);
-  try{const r=await fetch(url);if(!r.ok)throw 0;const csv=await r.text();ALL=parseCSV(csv);injectJobSchema(ALL);initFilters();updateStats();applyHash();render();buildTrusted();}
+  try{const r=await fetch(url);if(!r.ok)throw 0;const csv=await r.text();ALL=parseCSV(csv);injectJobSchema(ALL);initFilters();updateStats();buildDashboard();applyHash();render();buildTrusted();updateCompareTray();}
   catch(e){console.error('Job Load Error:',e);document.getElementById("job-list").innerHTML='<div class="state-msg"><span class="ic">⚠️</span>Couldn\'t load jobs.<span class="sub">Please refresh or check back later.</span></div>';}
 }
 function hkey(s){return cl(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
@@ -2759,6 +3176,59 @@ function setText(id,value){const el=document.getElementById(id);if(el)el.textCon
 function updateStats(){const jc=ALL.length,sc=new Set(ALL.map(j=>j.studio)).size,cc=new Set(ALL.map(j=>j.location).filter(Boolean)).size;setText('premium-role-count',jc);setText('premium-studio-count',sc);setText('premium-city-count',cc);if(!statsAni){statsAni=true;animC(document.getElementById('s-jobs'),jc);animC(document.getElementById('s-studios'),sc);animC(document.getElementById('s-cities'),cc);}}
 function injectJobSchema(jobs){const jld=jobs.map(j=>({"@context":"https://schema.org/","@type":"JobPosting","title":j.title,"description":j.desc||"Opportunity at "+j.studio,"datePosted":j.posted?new Date(j.posted).toISOString():new Date().toISOString(),"validThrough":new Date(Date.now()+30*24*60*60*1000).toISOString(),"employmentType":j.type?j.type.toUpperCase().replace("-","_"):"FULL_TIME","hiringOrganization":{"@type":"Organization","name":j.studio,"logo":"https://mapledevs.ca/og-image.png"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":j.location||"Canada","addressCountry":"CA"}},"jobLocationType":(j.mode||"").toLowerCase().includes("remote")?"TELECOMMUTE":undefined,"applicantLocationRequirements":(j.mode||"").toLowerCase().includes("remote")?{"@type":"Country","name":"Canada"}:undefined}));const el=document.getElementById("job-schema-dynamic");if(el)el.remove();const s=document.createElement("script");s.id="job-schema-dynamic";s.type="application/ld+json";s.text=JSON.stringify(jld);document.head.appendChild(s);}
 function buildTrusted(){const studios=[...new Set(ALL.map(j=>j.studio))].slice(0,12);const el=document.getElementById('trusted-logos');if(!el)return;el.innerHTML=studios.map(s=>'<span class="trusted-name">'+esc(s)+'</span>').join('');}
+
+function cityName(loc){return (loc||'Canada').split(',')[0].trim()||'Canada';}
+function countTop(items,getter,limit=4){const m={};items.forEach(item=>{const key=getter(item);if(!key)return;m[key]=(m[key]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,limit);}
+function renderBars(id,items,total){const el=document.getElementById(id);if(!el)return;if(!items.length){el.innerHTML='<div class="state-msg" style="padding:1rem 0">No signal yet</div>';return;}const max=Math.max(...items.map(i=>i[1]),1);el.innerHTML=items.map(([label,value])=>'<div class="bar-row"><span class="bar-label">'+esc(label)+'</span><span class="bar-track"><span class="bar-fill" style="--w:'+Math.round(value/max*100)+'%"></span></span><span class="bar-value">'+value+'</span></div>').join('');}
+function engineSignal(j){const b=engineBucket(j.engine);if(b==='unreal')return'Unreal';if(b==='unity')return'Unity';if(b==='godot')return'Godot';if(b==='c++ / proprietary')return'C++ / Proprietary';return engineFromText(j);}
+function buildDashboard(){
+  if(!ALL.length)return;
+  const cityTop=countTop(ALL,j=>cityName(j.location),5);
+  const engineTop=countTop(ALL,j=>engineSignal(j),5);
+  const salaryCount=ALL.filter(j=>j.salary).length;
+  const remoteCount=ALL.filter(j=>/remote|hybrid/i.test(j.mode||'')).length;
+  const freshCount=ALL.filter(j=>{const d=new Date(j.posted);return !isNaN(d)&&(Date.now()-d)/864e5<=7;}).length;
+  const topCity=cityTop[0]||['Canada',0];
+  const topEngine=engineTop[0]||['Mixed',0];
+  setText('top-city',topCity[0]);
+  setText('top-engine',topEngine[0]);
+  setText('feed-fresh-count',freshCount);
+  setText('feed-salary-count',salaryCount);
+  setText('feed-engine-count',ALL.filter(j=>j.engine||engineFromText(j)).length);
+  setText('feed-remote-count',remoteCount);
+  setText('brief-title',topCity[0]+' is leading current demand');
+  setText('brief-copy',topCity[1]+' open role'+(topCity[1]!==1?'s':'')+' are concentrated around '+topCity[0]+', with '+topEngine[0]+' showing the strongest engine signal across visible listings.');
+  const chips=[ALL.length+' open roles',new Set(ALL.map(j=>j.studio)).size+' studios',salaryCount+' salary-visible',remoteCount+' remote/hybrid'];
+  const chipEl=document.getElementById('brief-chips');
+  if(chipEl)chipEl.innerHTML=chips.map(c=>'<span class="brief-chip">'+esc(c)+'</span>').join('');
+  renderBars('city-bars',cityTop,ALL.length);
+  renderBars('engine-bars',engineTop,ALL.length);
+}
+function engineFromText(j){const t=((j.title||'')+' '+(j.desc||'')).toLowerCase();if(/unreal|ue5|ue 5/.test(t))return'Unreal';if(/unity/.test(t))return'Unity';if(/godot/.test(t))return'Godot';if(/c\+\+|proprietary|engine programmer/.test(t))return'C++ / Proprietary';return'';}
+function signalScore(j){let s=48;if(j.salary)s+=14;if(j.engine||engineFromText(j))s+=10;if(j.mode)s+=8;if(j.apply)s+=7;if(j.desc&&j.desc.length>140)s+=6;if(j.student)s+=4;if(hasVisa(j))s+=4;if(isNew(j.posted))s+=5;if(j.featured)s+=3;return Math.min(98,s);}
+function updateFitActive(){document.querySelectorAll('.fit-chip').forEach(btn=>btn.classList.toggle('active',btn.dataset.fit===smartFilter&&smartFilter!==''));}
+function resetFilterFields(){['search','f-city','f-type','f-mode','f-role','f-exp','f-engine','f-visa'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const st=document.getElementById('f-student');if(st)st.checked=false;}
+function applyPreset(kind){
+  smartFilter=kind||'';
+  resetFilterFields();
+  if(kind==='remote')document.getElementById('f-mode').value='Remote';
+  if(kind==='student')document.getElementById('f-student').checked=true;
+  if(kind==='visa')document.getElementById('f-visa').value='yes';
+  if(kind==='engine')document.getElementById('f-role').value='programming';
+  render();
+  const target=document.getElementById('main-content');
+  if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function isCompared(j){return compare.includes(jKey(j));}
+function saveCompare(){localStorage.setItem('md_compare',JSON.stringify(compare));}
+function toggleCompare(e,idx,rerender=true){e.stopPropagation();const j=ALL[idx],k=jKey(j),i=compare.indexOf(k);if(i>-1){compare.splice(i,1);toast('Removed from compare','');}else{if(compare.length>=3){compare.shift();toast('Compare keeps the latest 3 roles','');}compare.push(k);toast('Added to compare','');}saveCompare();updateCompareTray();if(rerender)render();}
+function removeCompareKey(k){compare=compare.filter(x=>x!==k);saveCompare();updateCompareTray();render();}
+function comparedJobs(){return compare.map(k=>ALL.find(j=>jKey(j)===k)).filter(Boolean);}
+function updateCompareTray(){const tray=document.getElementById('compare-tray'),list=document.getElementById('compare-list');if(!tray||!list)return;const jobs=comparedJobs();tray.classList.toggle('on',jobs.length>0);list.innerHTML=jobs.map(j=>'<div class="compare-pill"><span>'+esc(j.title)+'</span><button type="button" aria-label="Remove" onclick="removeCompareKey(decodeURIComponent(\''+encodeURIComponent(jKey(j))+'\'))">x</button></div>').join('');}
+function clearCompare(){compare=[];saveCompare();updateCompareTray();render();}
+function closeCompareModal(){document.getElementById('compare-modal').classList.remove('on');document.body.style.overflow='';}
+function openCompareModal(){const jobs=comparedJobs();if(!jobs.length){toast('Pick jobs to compare','');return;}renderCompareTable(jobs);document.getElementById('compare-modal').classList.add('on');document.body.style.overflow='hidden';}
+function renderCompareTable(jobs){const table=document.getElementById('compare-table');const row=(label,fn)=>'<div class="compare-row" style="--cols:'+jobs.length+'"><div class="compare-cell label">'+esc(label)+'</div>'+jobs.map(j=>'<div class="compare-cell">'+fn(j)+'</div>').join('')+'</div>';table.innerHTML=row('Role',j=>'<strong>'+esc(j.title)+'</strong><span>'+esc(j.studio)+'</span>')+row('Signal',j=>'<strong>'+signalScore(j)+'/100</strong>')+row('Location',j=>esc(j.location||'Canada'))+row('Work mode',j=>esc(j.mode||'Not listed'))+row('Salary',j=>esc(j.salary||'Not listed'))+row('Engine',j=>esc(j.engine||engineFromText(j)||'Not listed'))+row('Visa',j=>esc(visaText(j)))+row('Student',j=>j.student?'Student-friendly':'Not listed')+row('Apply',j=>j.apply?'<a href="'+esc(j.apply)+'" target="_blank" rel="noopener">Open application</a>':'Not listed');}
 
 /* ═══════ URL FILTERS ═══════ */
 function applyHash(){
@@ -2830,6 +3300,8 @@ function filtered(){
     if(en && engineBucket(j.engine)!==en) return false;
     if(vi==="yes" && !hasVisa(j)) return false;
     if(vi==="no" && hasVisa(j)) return false;
+    if(smartFilter==="salary" && !j.salary) return false;
+    if(smartFilter==="engine" && !(j.engine||engineFromText(j))) return false;
 
     if(ro){
       const r=ro==="programming"?/program|engineer|develop|tech|backend|frontend/i:ro==="art"?/art|animat|vfx|3d|2d|model/i:ro==="design"?/design|level/i:ro==="qa"?/qa|test|quality/i:ro==="production"?/produc|manage/i:ro==="audio"?/audio|sound|music/i:/.*/;
@@ -2856,6 +3328,7 @@ function render(){
   
   document.getElementById("r-count").textContent=allFiltered.length+" role"+(allFiltered.length!==1?"s":"");
   updPills(); syncHash();
+  updateHubHighlights(); updateFitActive(); updateCompareTray();
   
   if(!allFiltered.length){
     spotlightEl.style.display='none';
@@ -2908,7 +3381,7 @@ function spotlightHTML(j, ri){
   </div>`;
 }
 
-function loadMore(){dispCount+=PER_PAGE;const jobs=filtered(),list=document.getElementById("job-list"),vis=jobs.slice(0,dispCount);list.className="job-list";list.innerHTML=vis.map((j,i)=>cardHTML(j,ALL.indexOf(j),i)).join("");if(jobs.length>dispCount)list.innerHTML+='<div class="load-wrap"><button class="load-btn" onclick="loadMore()">Show more ('+(jobs.length-dispCount)+' remaining)</button></div>';}
+function loadMore(){dispCount+=PER_PAGE;const allFiltered=filtered(),featured=allFiltered.filter(j=>j.featured),standard=allFiltered.filter(j=>!j.featured),combined=[...standard],list=document.getElementById("job-list"),vis=combined.slice(0,dispCount);list.className="job-list";list.innerHTML=vis.map((j,i)=>cardHTML(j,ALL.indexOf(j),i)).join("");if(combined.length>dispCount)list.innerHTML+='<div class="load-wrap"><button class="load-btn" onclick="loadMore()">Show more ('+(combined.length-dispCount)+' remaining)</button></div>';requestAnimationFrame(observeCards);updateCompareTray();}
 
 function updPills(){const c=document.getElementById('f-pills'),q=document.getElementById('search').value,ci=document.getElementById('f-city').value,ty=document.getElementById('f-type').value,mo=document.getElementById('f-mode').value,ro=document.getElementById('f-role').value,ex=document.getElementById('f-exp').value,en=document.getElementById('f-engine').value,vi=document.getElementById('f-visa').value,st=document.getElementById('f-student').checked;let pills=[];
 if(q)pills.push({l:'"'+q+'"',fn:()=>{document.getElementById('search').value='';render();}});
@@ -2924,7 +3397,7 @@ if(!pills.length){c.innerHTML='';return;}
 c.innerHTML=pills.map((p,i)=>'<button class="f-pill" data-i="'+i+'">'+esc(p.l)+'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></button>').join('')+'<button class="f-clear" id="f-clr">Clear all</button>';
 pills.forEach((p,i)=>c.querySelector('[data-i="'+i+'"]').onclick=p.fn);
 document.getElementById('f-clr').onclick=clearAll;}
-function clearAll(){document.getElementById('search').value='';document.getElementById('f-city').value='';document.getElementById('f-type').value='';document.getElementById('f-mode').value='';document.getElementById('f-role').value='';document.getElementById('f-exp').value='';document.getElementById('f-engine').value='';document.getElementById('f-visa').value='';document.getElementById('f-student').checked=false;render();}
+function clearAll(){smartFilter='';document.getElementById('search').value='';document.getElementById('f-city').value='';document.getElementById('f-type').value='';document.getElementById('f-mode').value='';document.getElementById('f-role').value='';document.getElementById('f-exp').value='';document.getElementById('f-engine').value='';document.getElementById('f-visa').value='';document.getElementById('f-student').checked=false;render();}
 
 function heroSearch(e){
   if(e) e.preventDefault();
@@ -2950,8 +3423,9 @@ function hl(text,q){if(!q)return esc(text);const e=esc(text),qe=esc(q);const rx=
 
 /* ═══════ CARD ═══════ */
 function cardHTML(j,ri,ai){
-  const q=document.getElementById('search').value.toLowerCase(),sv=isSaved(j),dl=Math.min(ai*25,250);
+  const q=document.getElementById('search').value.toLowerCase(),sv=isSaved(j),cmp=isCompared(j),dl=Math.min(ai*25,250);
   const hot = isHot(j);
+  const score = signalScore(j);
   const badges=(j.featured?'<span class="b-feat">Featured</span>':'')+(isNew(j.posted)?'<span class="b-new">New</span>':'')+(hot && !j.featured?'<span class="b-new" style="background:rgba(255,100,35,0.1);color:#FF6423;border-color:rgba(255,100,35,0.2)">Active</span>':'');
   const facts=[
     metaItem('Location',j.location||'Canada'),
@@ -2981,6 +3455,7 @@ function cardHTML(j,ri,ai){
     </div>
     <aside class="jc-side">
       <div class="jc-side-top">
+        <span class="signal-score"><strong>${score}</strong><span>Signal</span></span>
         <span class="jc-salary">${esc(salary)}</span>
         <button class="sv-btn${sv?' saved':''}" onclick="toggleSave(event,${ri})" aria-label="${sv?'Unsave':'Save'}" title="${sv?'Saved':'Save'}">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="${sv?'currentColor':'none'}" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -2992,6 +3467,7 @@ function cardHTML(j,ri,ai){
       </div>
       <div class="jc-cta-row">
         ${applyAction}
+        <button type="button" class="btn-s compare-btn${cmp?' on':''}" onclick="toggleCompare(event,${ri})">${cmp?'Compared':'Compare'}</button>
         <button type="button" class="btn-s" onclick="openDet(${ri},event);event.stopPropagation()">Details</button>
       </div>
     </aside>
@@ -2999,18 +3475,20 @@ function cardHTML(j,ri,ai){
 }
 
 /* ═══════ DETAIL ═══════ */
-function detailHTML(j,idx){const sv=isSaved(j);
+function detailHTML(j,idx){const sv=isSaved(j),cmp=isCompared(j),score=signalScore(j);
 const apSec=j.apply?'<div class="apply-blk"><div class="d-label" style="margin-bottom:10px">How to apply</div>'+(j.apply.startsWith("mailto:")?'<p class="d-text" style="margin-bottom:1rem">'+esc(j.apply.replace("mailto:",""))+'</p>':'<p class="d-text" style="margin-bottom:1rem"><a href="'+esc(j.apply)+'" target="_blank" rel="noopener" style="color:var(--maple)">View application page</a></p>')+'<a class="apply-btn" href="'+esc(j.apply)+'" target="_blank" rel="noopener">Apply now</a></div>':'';
-const detailFacts='<div class="jc-meta" style="margin:1rem 0 0">'+metaItem('Location',j.location||'Canada')+metaItem('Work mode',j.mode||'Not listed')+metaItem('Salary',j.salary||'Not listed','salary')+'</div>';
+const detailFacts='<div class="jc-meta" style="margin:1rem 0 0">'+metaItem('Signal score',score+'/100')+metaItem('Location',j.location||'Canada')+metaItem('Work mode',j.mode||'Not listed')+metaItem('Salary',j.salary||'Not listed','salary')+'</div>';
 return '<div class="d-hdr"><div class="d-title">'+esc(j.title)+'</div><div class="d-studio">'+esc(j.studio)+(j.posted?' - Posted '+relDate(j.posted):'')+'</div>'
 +detailFacts
 +'<div class="d-pills" style="margin-top:12px">'+(j.type?'<span class="pill p-type">'+esc(j.type)+'</span>':'')+(j.engine?'<span class="pill p-engine">'+esc(j.engine)+'</span>':'')+(hasVisa(j)?'<span class="pill p-visa">'+visaText(j)+'</span>':'')+(j.student?'<span class="pill p-stu">Student-friendly</span>':'')+'</div>'
 +'<div class="d-acts"><button class="d-act-btn" onclick="shareJob('+idx+')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>'
++'<button class="d-act-btn compare-btn'+(cmp?' on':'')+'" onclick="togCompareDet(event,'+idx+')">'+(cmp?'Compared':'Compare')+'</button>'
 +'<button class="d-act-btn'+(sv?' saved':'')+'" onclick="togSaveDet(event,'+idx+')">'+(sv?'Saved':'Save')+'</button></div></div>'
 +(j.desc?'<div class="d-sec"><div class="d-label">About the role</div><div class="d-text">'+esc(j.desc)+'</div></div>':'')+apSec;}
 
 function shareJob(idx){const url=location.origin+location.pathname+'#job-'+idx;navigator.clipboard.writeText(url).then(()=>toast('Link copied','')).catch(()=>toast('Couldn\'t copy',''));}
 function togSaveDet(e,idx){e.stopPropagation();const j=ALL[idx],k=jKey(j),i=saved.indexOf(k);if(i>-1){saved.splice(i,1);toast('Removed','');}else{saved.push(k);toast('Saved','');}localStorage.setItem('md_saved',JSON.stringify(saved));updBadge();const b=e.currentTarget,s=isSaved(j);b.classList.toggle('saved',s);b.innerHTML=s?'Saved':'Save';}
+function togCompareDet(e,idx){toggleCompare(e,idx,false);const b=e.currentTarget,c=isCompared(ALL[idx]);b.classList.toggle('on',c);b.innerHTML=c?'Compared':'Compare';}
 
 function getSimilar(j,idx){return ALL.filter((o,i)=>i!==idx&&(o.studio===j.studio||o.location===j.location||o.type===j.type)).slice(0,3);}
 function openDet(idx,e){history.pushState({idx},"","#job-"+idx);const j=ALL[idx];hideAll();document.getElementById("detail-view").classList.add("on");
@@ -3157,7 +3635,7 @@ function closeAlertModal(){document.getElementById('alert-modal').classList.remo
 function handleAlertSignup(){const e=document.getElementById('alert-email').value;if(!e||!e.includes('@')){document.getElementById('alert-email').focus();return;}window.open('http://eepurl.com/jDQFL2','_blank');closeAlertModal();toast('Alerts enabled','');}
 
 /* ═══════ KEYBOARD SHORTCUTS ═══════ */
-document.addEventListener('keydown',function(e){if(e.key==='/'&&!e.ctrlKey&&!e.metaKey){const a=document.activeElement;if(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT')return;e.preventDefault();document.getElementById('search').focus();}if(e.key==='Escape'){const s=document.getElementById('search');if(document.activeElement===s&&s.value){s.value='';s.blur();render();}if(document.getElementById('post-modal').classList.contains('on'))closePostModal();if(document.getElementById('alert-modal').classList.contains('on'))closeAlertModal();}});
+document.addEventListener('keydown',function(e){if(e.key==='/'&&!e.ctrlKey&&!e.metaKey){const a=document.activeElement;if(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT')return;e.preventDefault();document.getElementById('search').focus();}if(e.key==='Escape'){const s=document.getElementById('search');if(document.activeElement===s&&s.value){s.value='';s.blur();render();}if(document.getElementById('post-modal').classList.contains('on'))closePostModal();if(document.getElementById('alert-modal').classList.contains('on'))closeAlertModal();if(document.getElementById('compare-modal').classList.contains('on'))closeCompareModal();}});
 
 /* ═══════ BROWSE BUTTON ═══════ */
 document.getElementById('browse-btn').addEventListener('click',function(e){e.preventDefault();document.getElementById('search').focus();document.getElementById('main-content').scrollIntoView({behavior:'smooth'});});
