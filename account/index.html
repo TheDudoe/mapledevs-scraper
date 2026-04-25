@@ -1135,7 +1135,6 @@
           .from('profiles')
           .insert({
             id: user.id,
-            email: user.email,
             account_type: 'candidate'
           })
           .select('*')
@@ -1378,7 +1377,6 @@
         const savedAt = new Date().toISOString();
         const payload = {
           id: state.user.id,
-          email: state.user.email,
           display_name: cleanText(value('profile-display-name')),
           username: username(value('profile-username')),
           account_type: value('profile-account-type') || 'candidate',
