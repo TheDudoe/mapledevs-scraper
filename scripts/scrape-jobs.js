@@ -870,6 +870,8 @@ const PIPELINE_SHEETS = {
 const PIPELINE_RANGE = 'A:AZ';
 const AUTO_APPROVE_SAFE_JOBS = process.env.AUTO_APPROVE_SAFE_JOBS !== 'false';
 const AUTO_APPROVE_SCORE = Number(process.env.AUTO_APPROVE_SCORE || 80);
+const JOB_MAX_AGE_DAYS = Number(process.env.JOB_MAX_AGE_DAYS || 90);
+const STALE_BY_DATE_STATUS = 'stale_by_date';
 
 const PIPELINE_HEADERS = [
   'job_id',
@@ -989,6 +991,52 @@ function isYes(value) {
   return ['yes', 'true', '1'].includes(String(value || '').trim().toLowerCase());
 }
 
+function parseJobDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+
+  const match = raw.match(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/);
+  if (match) {
+    const iso = new Date(`${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}T00:00:00Z`);
+    if (!Number.isNaN(iso.getTime())) return iso;
+  }
+
+  return null;
+}
+
+function jobAgeDays(record, now) {
+  const posted = parseJobDate(record.date_posted);
+  if (!posted) return null;
+  const reference = parseJobDate(now) || new Date();
+  return Math.floor((reference.getTime() - posted.getTime()) / 86400000);
+}
+
+function isOutdatedRecord(record, now) {
+  const age = jobAgeDays(record, now);
+  return age !== null && age > JOB_MAX_AGE_DAYS;
+}
+
+function outdatedReason(record, now) {
+  const age = jobAgeDays(record, now);
+  if (age === null) return '';
+  return `Outdated by date: posted ${age} days ago. Current limit is ${JOB_MAX_AGE_DAYS} days.`;
+}
+
+function markOutdated(record, now) {
+  const reason = outdatedReason(record, now);
+  return {
+    ...record,
+    status: 'expired',
+    link_status: STALE_BY_DATE_STATUS,
+    last_verified_at: now,
+    notes: record.notes ? `${record.notes} | ${reason}` : reason,
+    tags: mergeTags(record.tags, [STALE_BY_DATE_STATUS]),
+  };
+}
+
 function mergeTags(existing, additions) {
   const tags = new Set(String(existing || '').split(',').map(t => t.trim()).filter(Boolean));
   additions.forEach(tag => tags.add(tag));
@@ -1048,9 +1096,10 @@ function triageReviewRecord(record, now) {
   if (record.visa_sponsorship) { score += 2; tags.push('visa_signal'); }
 
   if (isGeneralApplication(record)) blockers.push('General application / talent pool');
+  if (isOutdatedRecord(record, now)) blockers.push(outdatedReason(record, now));
 
   const linkStatus = normalizeKey(record.link_status);
-  if (['expired', 'dead', 'missing_from_source', 'inactive'].includes(linkStatus)) {
+  if (['expired', 'dead', 'missing_from_source', 'inactive', STALE_BY_DATE_STATUS].includes(linkStatus)) {
     blockers.push(`Link status is ${record.link_status}`);
   }
 
@@ -1203,28 +1252,38 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   let rawExpired = 0;
   let promoted = 0;
   let liveExpired = 0;
+  let dateExpired = 0;
   let newAutoApproved = 0;
   let existingAutoApproved = 0;
   let reviewTriaged = 0;
   let liveDisabledByReview = 0;
+  const disabledLiveIds = new Set();
 
   for (const record of records) {
+    const recordForPipeline = isOutdatedRecord(record, now) ? markOutdated(record, now) : record;
     const existingRaw = rawIndex.get(record.job_id);
     if (existingRaw) {
-      await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.raw, existingRaw.rowNumber, objectToRow({
+      const rawRecord = recordForPipeline.link_status === STALE_BY_DATE_STATUS ? {
         ...existingRaw.object,
-        ...record,
+        ...recordForPipeline,
+        first_seen_at: existingRaw.object.first_seen_at || recordForPipeline.first_seen_at,
+      } : {
+        ...existingRaw.object,
+        ...recordForPipeline,
         status: existingRaw.object.status === 'expired' ? 'active' : (existingRaw.object.status || 'active'),
-        first_seen_at: existingRaw.object.first_seen_at || record.first_seen_at,
-      }, rawSheet.headers));
+        first_seen_at: existingRaw.object.first_seen_at || recordForPipeline.first_seen_at,
+      };
+      await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.raw, existingRaw.rowNumber, objectToRow(rawRecord, rawSheet.headers));
       rawUpdated++;
     } else {
-      rawRowsToAppend.push(objectToRow(record, rawSheet.headers));
+      rawRowsToAppend.push(objectToRow(recordForPipeline, rawSheet.headers));
     }
 
     if (!reviewIndex.has(record.job_id) && !liveIndex.has(record.job_id)) {
-      const triage = triageReviewRecord(record, now);
-      const reviewRecord = applyTriage(record, triage);
+      const triage = triageReviewRecord(recordForPipeline, now);
+      const reviewRecord = recordForPipeline.link_status === STALE_BY_DATE_STATUS
+        ? recordForPipeline
+        : applyTriage(recordForPipeline, triage);
       reviewRowsToAppend.push(objectToRow(reviewRecord, reviewSheet.headers));
 
       if (triage.status === 'approved') {
@@ -1239,6 +1298,7 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
         newAutoApproved++;
         promoted++;
       }
+      if (recordForPipeline.link_status === STALE_BY_DATE_STATUS) dateExpired++;
     }
   }
 
@@ -1268,12 +1328,15 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
       job_id: jobId,
     };
     const triage = triageReviewRecord(candidateRecord, now);
-    const triagedRecord = applyTriage(candidateRecord, triage);
+    const triagedRecord = isOutdatedRecord(candidateRecord, now)
+      ? markOutdated(candidateRecord, now)
+      : applyTriage(candidateRecord, triage);
 
     await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.review, reviewEntry.rowNumber, objectToRow(triagedRecord, reviewSheet.headers));
     reviewEntry.object = triagedRecord;
     reviewTriaged++;
     if (triage.status === 'approved') existingAutoApproved++;
+    if (triagedRecord.link_status === STALE_BY_DATE_STATUS) dateExpired++;
   }
 
   for (const [jobId, reviewEntry] of reviewIndex.entries()) {
@@ -1285,10 +1348,11 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
     await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
       ...existingLive.object,
       status,
-      link_status: status === 'rejected' ? 'inactive' : status,
+      link_status: reviewEntry.object.link_status || (status === 'rejected' ? 'inactive' : status),
       last_verified_at: now,
       notes: reviewEntry.object.notes || existingLive.object.notes || `Disabled from review: ${status}`,
     }, liveSheet.headers));
+    disabledLiveIds.add(jobId);
     liveDisabledByReview++;
   }
 
@@ -1307,6 +1371,19 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
       last_verified_at: now,
     };
     const existingLive = liveIndex.get(jobId);
+    if (isOutdatedRecord(liveRecord, now)) {
+      if (existingLive) {
+        await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow(markOutdated({
+          ...existingLive.object,
+          ...liveRecord,
+          first_seen_at: existingLive.object.first_seen_at || liveRecord.first_seen_at,
+        }, now), liveSheet.headers));
+        disabledLiveIds.add(jobId);
+        liveExpired++;
+        dateExpired++;
+      }
+      continue;
+    }
     if (existingLive) {
       await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
         ...existingLive.object,
@@ -1328,7 +1405,16 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
       link_status: 'missing_from_source',
       last_verified_at: now,
     }, liveSheet.headers));
+    disabledLiveIds.add(jobId);
     liveExpired++;
+  }
+
+  for (const [jobId, liveEntry] of liveIndex.entries()) {
+    if (disabledLiveIds.has(jobId)) continue;
+    if (!isOutdatedRecord(liveEntry.object, now)) continue;
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, liveEntry.rowNumber, objectToRow(markOutdated(liveEntry.object, now), liveSheet.headers));
+    liveExpired++;
+    dateExpired++;
   }
 
   console.log(`   Scraped unique jobs: ${records.length}`);
@@ -1342,6 +1428,7 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   console.log(`   jobs_live disabled by review decisions: ${liveDisabledByReview}`);
   console.log(`   jobs_live promoted/updated: ${promoted}`);
   console.log(`   jobs_live expired: ${liveExpired}`);
+  console.log(`   jobs expired by date limit (${JOB_MAX_AGE_DAYS} days): ${dateExpired}`);
   console.log('\nGoogle Sheet pipeline updated successfully.');
 }
 

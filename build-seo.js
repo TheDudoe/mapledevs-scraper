@@ -87,7 +87,9 @@ function parseCSV(t) {
         const linkStatus = cell(rw, ['link_status']);
         const featured = cell(rw, ['feature', 'Featured', '(Featured)'], 8).toLowerCase() === "yes";
         if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
-        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(hkey(linkStatus)) && !featured) continue;
+        const linkKey = hkey(linkStatus);
+        if (['stale_by_date', 'outdated', 'date_expired'].includes(linkKey)) continue;
+        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(linkKey) && !featured) continue;
         const title = cell(rw, ['Job Title', 'title'], 0);
         const studio = cell(rw, ['Studio Name', 'studio'], 1);
         const id = cell(rw, ['job_id']);
