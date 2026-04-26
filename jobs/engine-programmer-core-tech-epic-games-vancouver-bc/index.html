@@ -2398,9 +2398,25 @@ select {
   <section class="proof-s" aria-label="MapleDevs verification standards">
     <div class="proof-grid">
       <div class="proof-item"><b>Verified Canadian studios</b><span>Listings come from studios with a Canadian presence.</span></div>
-      <div class="proof-item"><b>Official application links</b><span>Roles point candidates to studio career pages or direct hiring contacts.</span></div>
+      <div class="proof-item"><b>Official application links</b><span>Roles point candidates to studio career pages or direct hiring contacts. Expired links can be reported from each job page.</span></div>
       <div class="proof-item"><b>Useful job details</b><span>Salary, engine, work mode, visa, and student-friendly data are surfaced when available.</span></div>
       <div class="proof-item"><b>No account required to browse</b><span>Browse and apply without login, or create an account for profiles, saved jobs, and studio tools.</span></div>
+    </div>
+  </section>
+
+  <section class="intelligence-s" aria-label="Community-requested MapleDevs improvements">
+    <div class="section-shell">
+      <div class="section-headline">
+        <h2>Built from Canadian game-dev feedback.</h2>
+        <p>MapleDevs is prioritizing the gaps people actually asked for: fresher listings, indie discovery, student paths, Alberta coverage, and Canada-friendly remote roles.</p>
+      </div>
+      <div class="signal-card-grid">
+        <div class="signal-card"><span class="k">Freshness</span><strong>Report stale jobs</strong><p>If a studio closes an application before the next scrape, candidates can flag it directly from the job detail page.</p></div>
+        <div class="signal-card"><span class="k">Indie discovery</span><strong>More studios</strong><p>MapleDevs is expanding beyond large studios so smaller Canadian teams and quieter hiring signals are easier to find.</p></div>
+        <div class="signal-card"><span class="k">Students & juniors</span><strong>Dedicated paths</strong><p>Entry-level, internships, co-op-friendly listings, and student-friendly tags stay prominent instead of buried in generic filters.</p></div>
+        <div class="signal-card"><span class="k">Alberta source</span><strong><a href="https://albertamakesgames.com/" target="_blank" rel="noopener">Alberta Makes Games</a></strong><p>Community-suggested regional directories are being used as leads for better Canadian studio coverage.</p></div>
+        <div class="signal-card"><span class="k">Coming next</span><strong>Canada-friendly remote</strong><p>Remote global roles that explicitly hire Canadians and a game-jam/community board are on the product queue.</p></div>
+      </div>
     </div>
   </section>
 
@@ -3322,8 +3338,13 @@ function cardHTML(j,ri,ai){
 }
 
 /* ═══════ DETAIL ═══════ */
+function staleHref(j){
+  const subject=encodeURIComponent('Stale MapleDevs listing: '+(j.title||'Role')+' at '+(j.studio||'Studio'));
+  const body=encodeURIComponent('This job may be expired or inaccurate.\n\nRole: '+(j.title||'')+'\nStudio: '+(j.studio||'')+'\nLocation: '+(j.location||'')+'\nApply link: '+(j.apply||'')+'\n\nNotes: ');
+  return 'mailto:mapledevsbusiness@gmail.com?subject='+subject+'&body='+body;
+}
 function detailHTML(j,idx){const sv=isSaved(j),cmp=isCompared(j),score=signalScore(j);
-const apSec=j.apply?'<div class="apply-blk"><div class="d-label" style="margin-bottom:10px">How to apply</div>'+(j.apply.startsWith("mailto:")?'<p class="d-text" style="margin-bottom:1rem">'+esc(j.apply.replace("mailto:",""))+'</p>':'<p class="d-text" style="margin-bottom:1rem"><a href="'+esc(j.apply)+'" target="_blank" rel="noopener" style="color:var(--maple)">View application page</a></p>')+'<a class="apply-btn" href="'+esc(j.apply)+'" target="_blank" rel="noopener">Apply now</a></div>':'';
+const apSec=j.apply?'<div class="apply-blk"><div class="d-label" style="margin-bottom:10px">How to apply</div>'+(j.apply.startsWith("mailto:")?'<p class="d-text" style="margin-bottom:1rem">'+esc(j.apply.replace("mailto:",""))+'</p>':'<p class="d-text" style="margin-bottom:1rem"><a href="'+esc(j.apply)+'" target="_blank" rel="noopener" style="color:var(--maple)">View application page</a></p>')+'<a class="apply-btn" href="'+esc(j.apply)+'" target="_blank" rel="noopener">Apply now</a><div class="d-acts" style="margin-top:12px"><a class="d-act-btn" href="'+esc(staleHref(j))+'">Report stale listing</a></div></div>':'';
 const detailFacts='<div class="jc-meta" style="margin:1rem 0 0">'+metaItem('Signal score',score+'/100')+metaItem('Location',j.location||'Canada')+metaItem('Work mode',j.mode||'Not listed')+metaItem('Salary',j.salary||'Not listed','salary')+'</div>';
 return '<div class="d-hdr"><div class="d-title">'+esc(j.title)+'</div><div class="d-studio">'+esc(j.studio)+(j.posted?' - Posted '+relDate(j.posted):'')+'</div>'
 +detailFacts
