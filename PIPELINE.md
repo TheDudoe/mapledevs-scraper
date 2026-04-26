@@ -31,6 +31,7 @@ scraper -> jobs_raw -> jobs_review -> jobs_live -> website
 - The website reads only this tab.
 - The website hides rows where `status` is not `approved`, `live`, or `active`.
 - The website also hides rows where `link_status` is `expired`, `dead`, `missing_from_source`, or `inactive`.
+- The website always hides rows where `link_status` is `stale_by_date`, even if the row is featured.
 
 ## Daily Use
 
@@ -77,6 +78,30 @@ Common reasons a row stays manual:
 - unclear location
 - missing title or studio
 - expired/dead/missing link status
+- date posted is older than the freshness limit
+
+## Outdated Job Protection
+
+The scraper compares each job's `Date Posted` against the current scraper run date.
+
+By default, jobs older than `90` days are marked:
+
+```text
+status = expired
+link_status = stale_by_date
+```
+
+Those jobs are hidden from the live website and the generated SEO pages.
+
+Jobs with no valid `Date Posted` are not automatically expired by age, because some ATS feeds do not publish a posting date. They are still removed when they disappear from the studio source.
+
+To change the age limit in GitHub Actions, set:
+
+```text
+JOB_MAX_AGE_DAYS=60
+```
+
+Use a lower number for a stricter board, or a higher number if studios in your source list often keep real roles open longer.
 
 If you want to turn off auto-approval temporarily, set this GitHub Actions environment variable:
 
