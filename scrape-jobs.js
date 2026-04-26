@@ -867,6 +867,10 @@ const PIPELINE_SHEETS = {
   live: 'jobs_live',
 };
 
+const PIPELINE_RANGE = 'A:AZ';
+const AUTO_APPROVE_SAFE_JOBS = process.env.AUTO_APPROVE_SAFE_JOBS !== 'false';
+const AUTO_APPROVE_SCORE = Number(process.env.AUTO_APPROVE_SCORE || 80);
+
 const PIPELINE_HEADERS = [
   'job_id',
   'Job Title',
@@ -893,6 +897,10 @@ const PIPELINE_HEADERS = [
   'notes',
   'date_reviewed',
   'tags',
+  'review_score',
+  'review_recommendation',
+  'review_reason',
+  'auto_reviewed_at',
 ];
 
 function normalizeKey(value) {
@@ -981,6 +989,107 @@ function isYes(value) {
   return ['yes', 'true', '1'].includes(String(value || '').trim().toLowerCase());
 }
 
+function mergeTags(existing, additions) {
+  const tags = new Set(String(existing || '').split(',').map(t => t.trim()).filter(Boolean));
+  additions.forEach(tag => tags.add(tag));
+  return Array.from(tags).join(', ');
+}
+
+function hasOfficialSource(record) {
+  const source = `${record.source_id || ''} ${record.job_id || ''}`;
+  return /\b(gh|lv|sr|as|wd)_/i.test(source);
+}
+
+function hasRealApplyTarget(record) {
+  const apply = String(record.how_to_apply || record.source_url || '').trim();
+  return /^https?:\/\//i.test(apply) || /^mailto:/i.test(apply);
+}
+
+function isGeneralApplication(record) {
+  const text = `${record.job_title || ''} ${record.description || ''}`.toLowerCase();
+  return /general application|spontaneous application|candidature spontan|future opportunit|talent community|expression of interest/.test(text);
+}
+
+function isProbablyCanadian(record) {
+  const location = String(record.location || '').toLowerCase();
+  if (!location) return false;
+  if (location === 'remote') return true;
+  const canadaRegex = new RegExp(`\\b(${CANADA_KEYWORDS.join('|')})\\b`, 'i');
+  return canadaRegex.test(location) || /\b(on|qc|bc|ab|sk|mb|ns|nb|pe|nl|yt|nt|nu)\b/i.test(location);
+}
+
+function triageReviewRecord(record, now) {
+  const reasons = [];
+  const blockers = [];
+  const tags = [];
+  let score = 0;
+
+  if (hasOfficialSource(record)) { score += 25; tags.push('official_ats'); }
+  else reasons.push('No official ATS source id');
+
+  if (record.studio_name) score += 10;
+  else blockers.push('Missing studio');
+
+  if (record.job_title) score += 10;
+  else blockers.push('Missing title');
+
+  if (hasRealApplyTarget(record)) { score += 20; tags.push('apply_link'); }
+  else blockers.push('Missing application link');
+
+  if (isProbablyCanadian(record)) { score += 15; tags.push('canadian_location'); }
+  else blockers.push('Location is not clearly Canadian');
+
+  if (String(record.description || '').length >= 80) score += 10;
+  else reasons.push('Short or missing description');
+
+  if (record.salary) { score += 3; tags.push('salary_listed'); }
+  if (record.engine) { score += 3; tags.push('engine_tagged'); }
+  if (isYes(record.student_friendly)) { score += 2; tags.push('student_friendly'); }
+  if (record.visa_sponsorship) { score += 2; tags.push('visa_signal'); }
+
+  if (isGeneralApplication(record)) blockers.push('General application / talent pool');
+
+  const linkStatus = normalizeKey(record.link_status);
+  if (['expired', 'dead', 'missing_from_source', 'inactive'].includes(linkStatus)) {
+    blockers.push(`Link status is ${record.link_status}`);
+  }
+
+  const safeToAutoApprove = AUTO_APPROVE_SAFE_JOBS && blockers.length === 0 && score >= AUTO_APPROVE_SCORE;
+  const reviewReason = blockers.length
+    ? `Needs review: ${blockers.join('; ')}${reasons.length ? `. Notes: ${reasons.join('; ')}` : ''}`
+    : reasons.length
+      ? `Auto-check passed with notes: ${reasons.join('; ')}`
+      : 'Auto-check passed: official source, Canadian location, and application link present';
+
+  return {
+    status: safeToAutoApprove ? 'approved' : 'needs_review',
+    review_score: String(Math.min(100, score)),
+    review_recommendation: safeToAutoApprove ? 'auto_approve' : 'manual_review',
+    review_reason: reviewReason,
+    auto_reviewed_at: safeToAutoApprove ? now : '',
+    date_reviewed: safeToAutoApprove ? now : '',
+    tags,
+  };
+}
+
+function applyTriage(record, triage) {
+  const next = {
+    ...record,
+    status: triage.status,
+    review_score: triage.review_score,
+    review_recommendation: triage.review_recommendation,
+    review_reason: triage.review_reason,
+    tags: mergeTags(record.tags, triage.tags.concat(triage.review_recommendation)),
+  };
+
+  if (!record.notes || /^Auto-(approved|triage)|^Needs review:/i.test(record.notes)) {
+    next.notes = triage.review_reason;
+  }
+  if (triage.date_reviewed) next.date_reviewed = triage.date_reviewed;
+  if (triage.auto_reviewed_at) next.auto_reviewed_at = triage.auto_reviewed_at;
+  return next;
+}
+
 function mergeOwnerControlledFields(baseRecord, ownerRecord) {
   if (!ownerRecord) return baseRecord;
   const next = { ...baseRecord };
@@ -1006,7 +1115,7 @@ async function readPipelineSheet(sheets, spreadsheetId, title) {
   await ensureSheet(sheets, spreadsheetId, title);
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${title}!A:Z`,
+    range: `${title}!${PIPELINE_RANGE}`,
   });
 
   let rows = response.data.values || [];
@@ -1060,7 +1169,7 @@ async function appendPipelineRows(sheets, spreadsheetId, sheetName, rows) {
   if (!rows.length) return;
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${sheetName}!A:Z`,
+    range: `${sheetName}!${PIPELINE_RANGE}`,
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
     resource: { values: rows },
@@ -1089,10 +1198,15 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   const scrapedIds = new Set(records.map(r => r.job_id));
   const rawRowsToAppend = [];
   const reviewRowsToAppend = [];
+  const liveRowsToAppend = [];
   let rawUpdated = 0;
   let rawExpired = 0;
   let promoted = 0;
   let liveExpired = 0;
+  let newAutoApproved = 0;
+  let existingAutoApproved = 0;
+  let reviewTriaged = 0;
+  let liveDisabledByReview = 0;
 
   for (const record of records) {
     const existingRaw = rawIndex.get(record.job_id);
@@ -1109,12 +1223,28 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
     }
 
     if (!reviewIndex.has(record.job_id) && !liveIndex.has(record.job_id)) {
-      reviewRowsToAppend.push(objectToRow({ ...record, status: 'needs_review' }, reviewSheet.headers));
+      const triage = triageReviewRecord(record, now);
+      const reviewRecord = applyTriage(record, triage);
+      reviewRowsToAppend.push(objectToRow(reviewRecord, reviewSheet.headers));
+
+      if (triage.status === 'approved') {
+        liveRowsToAppend.push(objectToRow({
+          ...reviewRecord,
+          status: 'approved',
+          link_status: 'active',
+          first_seen_at: reviewRecord.first_seen_at || now,
+          last_seen_at: now,
+          last_verified_at: now,
+        }, liveSheet.headers));
+        newAutoApproved++;
+        promoted++;
+      }
     }
   }
 
   await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.raw, rawRowsToAppend);
   await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.review, reviewRowsToAppend);
+  await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.live, liveRowsToAppend);
 
   for (const [jobId, existingRaw] of rawIndex.entries()) {
     if (scrapedIds.has(jobId)) continue;
@@ -1125,6 +1255,41 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
       last_verified_at: now,
     }, rawSheet.headers));
     rawExpired++;
+  }
+
+  for (const [jobId, reviewEntry] of reviewIndex.entries()) {
+    const status = normalizeKey(reviewEntry.object.status);
+    if (!['', 'new', 'needs_review'].includes(status)) continue;
+
+    const sourceRecord = records.find(r => r.job_id === jobId) || rawIndex.get(jobId)?.object || reviewEntry.object;
+    const candidateRecord = {
+      ...sourceRecord,
+      ...reviewEntry.object,
+      job_id: jobId,
+    };
+    const triage = triageReviewRecord(candidateRecord, now);
+    const triagedRecord = applyTriage(candidateRecord, triage);
+
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.review, reviewEntry.rowNumber, objectToRow(triagedRecord, reviewSheet.headers));
+    reviewEntry.object = triagedRecord;
+    reviewTriaged++;
+    if (triage.status === 'approved') existingAutoApproved++;
+  }
+
+  for (const [jobId, reviewEntry] of reviewIndex.entries()) {
+    const status = normalizeKey(reviewEntry.object.status);
+    if (!['rejected', 'inactive', 'expired'].includes(status)) continue;
+    const existingLive = liveIndex.get(jobId);
+    if (!existingLive) continue;
+
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
+      ...existingLive.object,
+      status,
+      link_status: status === 'rejected' ? 'inactive' : status,
+      last_verified_at: now,
+      notes: reviewEntry.object.notes || existingLive.object.notes || `Disabled from review: ${status}`,
+    }, liveSheet.headers));
+    liveDisabledByReview++;
   }
 
   for (const [, reviewEntry] of reviewIndex.entries()) {
@@ -1171,6 +1336,10 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   console.log(`   jobs_raw updated: ${rawUpdated}`);
   console.log(`   jobs_raw expired: ${rawExpired}`);
   console.log(`   jobs_review new rows: ${reviewRowsToAppend.length}`);
+  console.log(`   jobs_review auto-approved new rows: ${newAutoApproved}`);
+  console.log(`   jobs_review existing rows triaged: ${reviewTriaged}`);
+  console.log(`   jobs_review existing rows auto-approved: ${existingAutoApproved}`);
+  console.log(`   jobs_live disabled by review decisions: ${liveDisabledByReview}`);
   console.log(`   jobs_live promoted/updated: ${promoted}`);
   console.log(`   jobs_live expired: ${liveExpired}`);
   console.log('\nGoogle Sheet pipeline updated successfully.');

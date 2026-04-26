@@ -16,10 +16,14 @@ scraper -> jobs_raw -> jobs_review -> jobs_live -> website
 
 `jobs_review`
 
-- New jobs that are not already live land here with `status` set to `needs_review`.
-- This is the tab you review manually.
+- New jobs that are not already live land here.
+- The scraper auto-triages each new row.
+- High-confidence official ATS jobs can be auto-approved.
+- Suspicious, generic, or incomplete rows stay as `needs_review`.
+- This is the tab you review manually only when a row still says `needs_review`.
 - To publish a job, change its `status` to `approved`.
 - To skip a job, change its `status` to `rejected`.
+- If a job is already live and you later mark its review row `rejected`, `inactive`, or `expired`, the next scraper run disables the matching row in `jobs_live`.
 
 `jobs_live`
 
@@ -32,11 +36,61 @@ scraper -> jobs_raw -> jobs_review -> jobs_live -> website
 
 1. Let the GitHub Action run the scraper.
 2. Open the `jobs_review` tab.
-3. Check any rows with `status = needs_review`.
-4. Fix title, studio, location, salary, or description if needed.
-5. Change `status` to `approved` for jobs you want public.
-6. Run the workflow again, or wait for the next scheduled run.
-7. Approved jobs will appear in `jobs_live`, then on the website.
+3. Filter `status` to `needs_review`.
+4. Only review those rows.
+5. Fix title, studio, location, salary, or description if needed.
+6. Change `status` to `approved` for jobs you want public.
+7. Change `status` to `rejected` for general applications, stale roles, or non-job pages.
+8. Run the workflow again, or wait for the next scheduled run.
+9. Approved jobs will appear in `jobs_live`, then on the website.
+
+## Auto-Triage
+
+The scraper now scores each review row using simple safety checks:
+
+- official ATS source id
+- studio name exists
+- job title exists
+- application link exists
+- Canadian or remote location is clear
+- description has enough useful text
+- extra useful fields such as salary, engine, student-friendly, or visa signal
+
+Rows that pass the threshold are marked:
+
+```text
+status = approved
+review_recommendation = auto_approve
+```
+
+Rows that need human attention stay:
+
+```text
+status = needs_review
+review_recommendation = manual_review
+```
+
+Common reasons a row stays manual:
+
+- general application / spontaneous application / talent pool
+- missing application link
+- unclear location
+- missing title or studio
+- expired/dead/missing link status
+
+If you want to turn off auto-approval temporarily, set this GitHub Actions environment variable:
+
+```text
+AUTO_APPROVE_SAFE_JOBS=false
+```
+
+If you want stricter auto-approval, raise:
+
+```text
+AUTO_APPROVE_SCORE=90
+```
+
+The default score threshold is `80`.
 
 ## Featured Jobs
 
@@ -59,6 +113,10 @@ These fields are for the pipeline and should not be shown as visible job details
 - `last_verified_at`
 - `status`
 - `tags`
+- `review_score`
+- `review_recommendation`
+- `review_reason`
+- `auto_reviewed_at`
 - `link_status`
 - `first_seen_at`
 - `last_seen_at`
