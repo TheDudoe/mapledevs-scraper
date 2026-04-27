@@ -397,6 +397,39 @@ function normalizeLocation(raw, studioCity = '', filter = null) {
   return loc;
 }
 
+/**
+ * Normalizes ugly job titles.
+ * Removes [Project Tags] and bilingual "French - English" formatting.
+ */
+function normalizeTitle(raw) {
+  if (!raw) return '';
+  let title = raw.trim();
+
+  // Remove leading bracket tags: "[Disney Dreamlight Valley] "
+  title = title.replace(/^\[.*?\]\s*/g, '');
+  
+  // Split by " - " or " / "
+  if (title.includes(' - ')) {
+    const parts = title.split(' - ');
+    if (parts.length === 2) {
+       const fr = /\(trice\)|\(e\)(?!\w)|\(euse\)|responsable|développeur|programmeur|directeur|artiste|concepteur|analyste|spécialiste|ingénieur/i;
+       const p1fr = fr.test(parts[0]);
+       const p2fr = fr.test(parts[1]);
+       
+       if (p1fr && !p2fr) title = parts[1];
+       else if (p2fr && !p1fr) title = parts[0];
+    }
+  }
+  
+  // Clean up gender/diversity tags like (m/f/x), (h/f)
+  title = title.replace(/\s*\([hmf]\/[hmf](?:\/[x])?\)/ig, '');
+  
+  // Clean up remaining brackets anywhere in the string
+  title = title.replace(/\[.*?\]/g, '').trim();
+
+  return title;
+}
+
 // ═══════════════════════════════════════════════
 // HTTP HELPERS
 // ═══════════════════════════════════════════════
@@ -547,7 +580,7 @@ async function scrapeGreenhouse(studio) {
         if (!cleanLoc) return null;
 
         return {
-          title: cleanTitle,
+          title: normalizeTitle(cleanTitle),
           studio: studio.name,
           location: cleanLoc,
           type: guessJobType(job.title, job.content || ''),
@@ -590,7 +623,7 @@ async function scrapeLever(studio) {
         if (!cleanLoc) return null;
 
         return {
-          title: cleanTitle,
+          title: normalizeTitle(cleanTitle),
           studio: studio.name,
           location: cleanLoc,
           type: job.categories?.commitment || guessJobType(job.text, job.descriptionPlain || ''),
@@ -632,7 +665,7 @@ async function scrapeSmartRecruiters(studio) {
         if (!cleanLoc) return null;
 
         return {
-          title: job.name || '',
+          title: normalizeTitle(job.name || ''),
           studio: studio.name,
           location: cleanLoc,
           type: guessJobType(job.name, ''),
@@ -673,7 +706,7 @@ async function scrapeAshby(studio) {
         if (!cleanLoc) return null;
 
         return {
-          title: job.title || '',
+          title: normalizeTitle(job.title || ''),
           studio: studio.name,
           location: cleanLoc,
           type: job.employmentType || guessJobType(job.title, job.description || ''),
@@ -737,7 +770,7 @@ async function scrapeWorkday(studio) {
               if (!cleanLoc) return null;
 
               return {
-                title: job.title || '',
+                title: normalizeTitle(job.title || ''),
                 studio: studio.name,
                 location: cleanLoc,
                 type: guessJobType(job.title, ''),
