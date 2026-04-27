@@ -8,6 +8,9 @@ const INDEX_PATH = path.join(ROOT_DIR, 'index.html');
 const SHEET_DOC_ID = '1L2KcTO32jK5MVY1m3qdqdja7LTZ38f8lYXsK5mNMMDo';
 const LIVE_SHEET_NAME = 'jobs_live';
 const LIVE_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_DOC_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(LIVE_SHEET_NAME)}`;
+const KNOWN_DEAD_APPLY_URLS = new Set([
+    'https://job-boards.greenhouse.io/2k/jobs/7678028003'
+]);
 
 const SEO_TARGETS = [
     { folder: 'vancouver', hash: '#city=Vancouver', title: 'Vancouver Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Vancouver, BC. No US roles. Salaries, entry-level, and remote roles included.' },
@@ -89,11 +92,12 @@ function parseCSV(t) {
         if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
         const linkKey = hkey(linkStatus);
         if (['stale_by_date', 'outdated', 'date_expired'].includes(linkKey)) continue;
-        if(['expired', 'dead', 'missing_from_source', 'inactive'].includes(linkKey) && !featured) continue;
+        if(['expired', 'dead', 'missing_from_source', 'inactive', 'closed', 'not_found'].includes(linkKey)) continue;
         const title = cell(rw, ['Job Title', 'title'], 0);
         const studio = cell(rw, ['Studio Name', 'studio'], 1);
         const id = cell(rw, ['job_id']);
         const apply = cell(rw, ['How to Apply', 'Apply URL', 'apply', 'source_url'], 6);
+        if (KNOWN_DEAD_APPLY_URLS.has(apply)) continue;
         const location = cell(rw, ['Location'], 2);
         if(!rw||!title||!studio)continue;
         const key = hkey(`${title}|${studio}|${location}`);
