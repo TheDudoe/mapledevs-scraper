@@ -26,7 +26,13 @@
  * - GOOGLE_PRIVATE_KEY: Service account private key (base64 encoded)
  */
 
+const http = require('http');
 const https = require('https');
+
+const VALIDATE_APPLY_LINKS = process.env.VALIDATE_APPLY_LINKS !== 'false';
+const LINK_CHECK_CONCURRENCY = Math.max(1, Number(process.env.LINK_CHECK_CONCURRENCY || 6));
+const LINK_CHECK_TIMEOUT_MS = Math.max(1000, Number(process.env.LINK_CHECK_TIMEOUT_MS || 8000));
+const LINK_CHECK_MAX_REDIRECTS = 5;
 
 // ═══════════════════════════════════════════════
 // STUDIO CONFIGURATION
@@ -409,6 +415,115 @@ function httpGet(url) {
       });
     }).on('error', reject);
   });
+}
+
+function probeApplyURL(url, redirects = 0) {
+  return new Promise((resolve) => {
+    const raw = String(url || '').trim();
+    if (!raw || /^mailto:/i.test(raw)) {
+      return resolve({ status: 'ok', statusCode: 200, finalUrl: raw, body: '' });
+    }
+
+    let parsed;
+    try {
+      parsed = new URL(raw);
+    } catch (err) {
+      return resolve({ status: 'dead', reason: 'Invalid application URL', finalUrl: raw, body: '' });
+    }
+
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return resolve({ status: 'unknown', reason: `Unsupported protocol: ${parsed.protocol}`, finalUrl: raw, body: '' });
+    }
+
+    const client = parsed.protocol === 'http:' ? http : https;
+    const req = client.request(parsed, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; MapleDevs-LinkCheck/1.0; +https://mapledevs.ca/)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
+    }, (res) => {
+      const statusCode = res.statusCode || 0;
+      const location = res.headers.location;
+      if ([301, 302, 303, 307, 308].includes(statusCode) && location && redirects < LINK_CHECK_MAX_REDIRECTS) {
+        res.resume();
+        try {
+          const nextUrl = new URL(location, parsed).toString();
+          return resolve(probeApplyURL(nextUrl, redirects + 1));
+        } catch (err) {
+          return resolve({ status: 'dead', reason: 'Invalid redirect URL', statusCode, finalUrl: raw, body: '' });
+        }
+      }
+
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', chunk => {
+        if (body.length < 50000) body += chunk.slice(0, 50000 - body.length);
+      });
+      res.on('end', () => resolve({ status: 'ok', statusCode, finalUrl: parsed.toString(), body }));
+    });
+
+    req.setTimeout(LINK_CHECK_TIMEOUT_MS, () => {
+      req.destroy(new Error('timeout'));
+    });
+    req.on('error', err => {
+      resolve({ status: 'unknown', reason: err.message, finalUrl: raw, body: '' });
+    });
+    req.end();
+  });
+}
+
+function isDeadApplyProbe(probe) {
+  if (!probe || probe.status === 'unknown') return false;
+  if (probe.status === 'dead') return true;
+
+  const status = Number(probe.statusCode || 0);
+  if ([404, 410].includes(status)) return true;
+  if (status >= 400 && status < 500 && ![400, 401, 403, 405, 429].includes(status)) return true;
+
+  const text = `${probe.finalUrl || ''}\n${probe.body || ''}`;
+  return /[?&]error=true\b/i.test(text)
+    || /\b(job|posting|position).{0,60}\b(no longer available|closed|expired|filled)\b/i.test(text)
+    || /\bno longer accepting applications\b/i.test(text)
+    || /\b(page not found|job not found|posting not found)\b/i.test(text);
+}
+
+async function filterDeadApplyLinks(jobs) {
+  if (!VALIDATE_APPLY_LINKS || !jobs.length) return jobs;
+
+  console.log(`\nChecking application links (${jobs.length} jobs, concurrency ${LINK_CHECK_CONCURRENCY})...`);
+  const keep = new Array(jobs.length).fill(true);
+  let cursor = 0;
+  let checked = 0;
+  let dead = 0;
+  let unknown = 0;
+
+  async function worker() {
+    while (cursor < jobs.length) {
+      const index = cursor++;
+      const job = jobs[index];
+      const applyUrl = String(job.applyUrl || '').trim();
+      if (!applyUrl || /^mailto:/i.test(applyUrl)) continue;
+
+      const probe = await probeApplyURL(applyUrl);
+      checked++;
+      if (probe.status === 'unknown') {
+        unknown++;
+        continue;
+      }
+      if (isDeadApplyProbe(probe)) {
+        keep[index] = false;
+        dead++;
+        console.log(`  Dead apply link: ${job.title} at ${job.studio} -> ${applyUrl}${probe.finalUrl && probe.finalUrl !== applyUrl ? ` (final: ${probe.finalUrl})` : ''}`);
+      }
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(LINK_CHECK_CONCURRENCY, jobs.length) }, () => worker());
+  await Promise.all(workers);
+  console.log(`Application links checked: ${checked}; removed dead links: ${dead}; kept after inconclusive checks: ${unknown}`);
+
+  return jobs.filter((_, index) => keep[index]);
 }
 
 // ═══════════════════════════════════════════════
@@ -847,7 +962,7 @@ async function scrapeAll() {
   console.log(`   Studios processed: ${STUDIOS.length}`);
   console.log(`   Unique studios with jobs: ${new Set(allJobs.map(j => j.studio)).size}`);
 
-  return allJobs;
+  return filterDeadApplyLinks(allJobs);
 }
 
 // ═══════════════════════════════════════════════
@@ -1359,18 +1474,32 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   for (const [, reviewEntry] of reviewIndex.entries()) {
     if (normalizeKey(reviewEntry.object.status) !== 'approved') continue;
     const jobId = reviewEntry.object.job_id;
+    const existingLive = liveIndex.get(jobId);
+    if (!scrapedIds.has(jobId) && hasOfficialSource(reviewEntry.object)) {
+      if (existingLive) {
+        await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
+          ...existingLive.object,
+          status: 'expired',
+          link_status: 'missing_from_source',
+          last_verified_at: now,
+          notes: existingLive.object.notes || 'Expired because the official source no longer returned this role.',
+        }, liveSheet.headers));
+        disabledLiveIds.add(jobId);
+        liveExpired++;
+      }
+      continue;
+    }
+
     const sourceRecord = records.find(r => r.job_id === jobId) || reviewEntry.object;
     const existingLiveRecord = liveIndex.get(jobId)?.object;
-    const isFeatured = isYes(reviewEntry.object.featured) || isYes(existingLiveRecord?.featured);
     const liveRecord = {
       ...mergeOwnerControlledFields(sourceRecord, existingLiveRecord),
       ...reviewEntry.object,
       status: 'approved',
-      link_status: isFeatured || scrapedIds.has(jobId) ? 'active' : (reviewEntry.object.link_status || 'active'),
+      link_status: 'active',
       last_seen_at: scrapedIds.has(jobId) ? now : (reviewEntry.object.last_seen_at || now),
       last_verified_at: now,
     };
-    const existingLive = liveIndex.get(jobId);
     if (isOutdatedRecord(liveRecord, now)) {
       if (existingLive) {
         await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow(markOutdated({
@@ -1398,7 +1527,7 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
 
   for (const [jobId, liveEntry] of liveIndex.entries()) {
     if (scrapedIds.has(jobId)) continue;
-    if (isYes(liveEntry.object.featured)) continue;
+    if (isYes(liveEntry.object.featured) && !hasOfficialSource(liveEntry.object)) continue;
     await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, liveEntry.rowNumber, objectToRow({
       ...liveEntry.object,
       status: 'expired',

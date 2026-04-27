@@ -88,7 +88,7 @@
       "identifier": {
         "@type": "PropertyValue",
         "name": "Epic Games",
-        "value": "principal game designer, engagement-epic games"
+        "value": "principal-game-designer-engagement-epic-games-vancouver-bc"
       },
       "hiringOrganization": {
         "@type": "Organization",
@@ -834,6 +834,7 @@ mark.hl { background: rgba(200,55,45,0.1); color: inherit; padding: 1px 2px; bor
 .option-row { display: flex; align-items: flex-start; gap: 8px; border: 1px solid var(--border); background: var(--bg-subtle); border-radius: var(--r-s); padding: 10px 12px; cursor: pointer; }
 .option-row input { width: auto; margin-top: 2px; accent-color: var(--maple); }
 .option-row span { color: var(--text-1); line-height: 1.45; }
+.policy-note { display: block; color: var(--text-3); font-size: 12px; line-height: 1.45; margin-top: 6px; }
 .fg label .req { color: var(--maple); }
 .fg input, .fg select, .fg textarea { font-family: inherit; font-size: 13px; padding: 9px 12px; border: 1px solid var(--border-s); border-radius: var(--r-s); background: var(--bg-input); color: var(--text-1); outline: none; transition: all var(--dur); }
 .fg .option-row input { width: auto; min-height: auto; padding: 0; border: 0; background: transparent; box-shadow: none; }
@@ -2343,6 +2344,7 @@ select {
         <h2 id="post-modal-title">Post a Job on MapleDevs</h2>
         <p>Standard listings are free. Featured placement is optional and remains <b>$29 CAD</b>.</p>
         <p style="font-size:12px;color:var(--text-3);margin-top:6px;"><strong style="color:var(--text-2)">Featured payment via Interac e-Transfer:</strong> <a href="mailto:wupeiheng11@gmail.com" style="color:var(--maple);text-decoration:underline;">wupeiheng11@gmail.com</a></p>
+        <p style="font-size:12px;color:var(--text-3);margin-top:6px;">Featured placement payments are final and non-refundable once the listing is live.</p>
       </div>
       <button class="modal-close" onclick="closePostModal()" aria-label="Close">&times;</button>
     </div>
@@ -2358,6 +2360,7 @@ select {
         <input type="hidden" name="_subject" value="[MapleDevs] New Job Posting Request">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="Featured Refund Policy" value="Featured placement payments are final and non-refundable once the listing is live.">
 
         <div class="fg full">
           <label>Job Title <span class="req">*</span></label>
@@ -2431,7 +2434,7 @@ select {
         <div class="fg full">
           <label class="option-row">
             <input type="checkbox" name="Featured Listing" value="Requested - $29 CAD">
-            <span><strong>Request featured placement ($29 CAD)</strong><br>Featured jobs are highlighted on the board and reviewed for priority placement. Standard listings remain free.</span>
+            <span><strong>Request featured placement ($29 CAD)</strong><br>Featured jobs are highlighted on the board and reviewed for priority placement. Standard listings remain free.<small class="policy-note">By requesting featured placement, you agree the payment is final and non-refundable once the listing is live.</small></span>
           </label>
         </div>
         <div class="form-divider"></div>
@@ -2902,7 +2905,7 @@ select {
   <section class="about-cta about-reveal">
     <h2>Hiring at a Canadian game studio?</h2>
     <p>Use the job submission form or email <a href="mailto:mapledevsbusiness@gmail.com">mapledevsbusiness@gmail.com</a>.</p>
-    <div class="about-price">Standard listings are <b>free</b>. Featured listings stay <b>$29 CAD</b>, payable by Interac e-Transfer to <b>wupeiheng11@gmail.com</b>.</div>
+    <div class="about-price">Standard listings are <b>free</b>. Featured listings stay <b>$29 CAD</b>, payable by Interac e-Transfer to <b>wupeiheng11@gmail.com</b>. Featured placement payments are non-refundable once live.</div>
   </section>
 
   <div id="about-platform-sections" class="about-platform-sections" aria-label="More about MapleDevs"></div>
@@ -2962,7 +2965,7 @@ select {
 <div id="terms-view" class="view" role="main"><div class="about-c">
   <button class="back-b" onclick="showBoard()">← Back to jobs</button>
   <h1>Terms of <em>Use</em></h1>
-  <p style="font-size:12px; color:var(--text-3); margin-bottom:1.5rem;">Last updated: April 20, 2026</p>
+  <p style="font-size:12px; color:var(--text-3); margin-bottom:1.5rem;">Last updated: April 27, 2026</p>
   
   <h2>1. Acceptance of Terms</h2>
   <p>By using MapleDevs (mapledevs.ca), you agree to these terms. If you do not agree, please discontinue use of the site. We reserve the right to update these terms at any time.</p>
@@ -2977,10 +2980,13 @@ select {
   <p>Standard job listings are currently free. <strong>Featured Listings</strong> are available for <strong>$29 CAD</strong>. Featured roles stay at the top of the board, receive priority in our newsletter, and are highlighted on social media. 
   <br><br>Payments must be sent via <strong>Interac e-Transfer</strong> to <a href="mailto:wupeiheng11@gmail.com">wupeiheng11@gmail.com</a>. Listings are published/featured only after payment is confirmed. All sales are final and non-refundable once the listing is live.</p>
   
-  <h2>5. Intellectual Property</h2>
+  <h2>5. Featured Listing Refund Policy</h2>
+  <p>Featured listing payments are final and non-refundable once the listing has been published or moved into featured placement. MapleDevs may remove stale, expired, inaccurate, or non-Canadian listings to protect candidate trust; removal after publication does not create a refund obligation. If MapleDevs cannot publish the featured placement, we will contact the employer before accepting payment or return the payment if already sent.</p>
+  
+  <h2>6. Intellectual Property</h2>
   <p>The MapleDevs brand, logo, and custom code are property of MapleDevs. Job titles and studio logos remain the intellectual property of their respective owners.</p>
   
-  <h2>6. Governing Law</h2>
+  <h2>7. Governing Law</h2>
   <p>These terms are governed by the laws of British Columbia, Canada.</p>
 </div></div>
 
@@ -3049,6 +3055,7 @@ select {
    ═══════════════════════════════════════════════════ */
 const SHEET_DOC_ID = "1L2KcTO32jK5MVY1m3qdqdja7LTZ38f8lYXsK5mNMMDo";
 const LIVE_SHEET_NAME = "jobs_live";
+const KNOWN_DEAD_APPLY_URLS = new Set(["https://job-boards.greenhouse.io/2k/jobs/7678028003"]);
 const PER_PAGE = 20;
 const DISCORD_INVITE_URL = "https://discord.com/invite/TXGyQYRYg9";
 let ALL = [], dispCount = PER_PAGE;
@@ -3337,7 +3344,7 @@ async function loadJobs(){
 }
 function hkey(s){return cl(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
 function cell(r,h,names,fallback){for(const n of names){const i=h.indexOf(hkey(n));if(i>-1)return cl(r[i]);}return fallback!==undefined?cl(r[fallback]):"";}
-function parseCSV(t){const rows=[],jobs=[];let r=[],c="",q=false;for(let i=0;i<t.length;i++){const ch=t[i],nx=t[i+1];if(ch==='"'){if(q&&nx==='"'){c+='"';i++;}else{q=!q;}}else if(ch===','&&!q){r.push(c);c="";}else if(ch==='\n'&&!q){r.push(c);rows.push(r);r=[];c="";}else if(ch!=='\r'||q){c+=ch;}}if(r.length||c){r.push(c);rows.push(r);}if(!rows.length)return jobs;const h=rows[0].map(hkey),seen=new Set();for(let i=1;i<rows.length;i++){const rw=rows[i];const status=cell(rw,h,['status']);const link=cell(rw,h,['link_status']);const linkKey=hkey(link);const featured=cell(rw,h,['feature','Featured','(Featured)'],8).toLowerCase()==="yes";if(status&&!['approved','live','active'].includes(hkey(status)))continue;if(['stale_by_date','outdated','date_expired'].includes(linkKey))continue;if(['expired','dead','missing_from_source','inactive'].includes(linkKey)&&!featured)continue;const title=cell(rw,h,['Job Title','title'],0),studio=cell(rw,h,['Studio Name','studio'],1),location=cell(rw,h,['Location'],2),apply=cell(rw,h,['How to Apply','Apply URL','apply','source_url'],6),id=cell(rw,h,['job_id']);if(!rw||!title||!studio)continue;const key=hkey(title+'|'+studio+'|'+location);if(seen.has(key))continue;seen.add(key);jobs.push({id,title,studio,location,type:cell(rw,h,['Job Type','type'],3),mode:cell(rw,h,['Work Mode','mode'],4),desc:cell(rw,h,['Description','desc'],5),apply,posted:cell(rw,h,['Date Posted','posted'],7),featured,student:cell(rw,h,['Student Friendly','(Student Friendly)'],9).toLowerCase()==="yes",salary:cell(rw,h,['Salary'],10),engine:cell(rw,h,['Engine'],11),visa:cell(rw,h,['Visa Sponsorship','visa'],12)});}return jobs;}
+function parseCSV(t){const rows=[],jobs=[];let r=[],c="",q=false;for(let i=0;i<t.length;i++){const ch=t[i],nx=t[i+1];if(ch==='"'){if(q&&nx==='"'){c+='"';i++;}else{q=!q;}}else if(ch===','&&!q){r.push(c);c="";}else if(ch==='\n'&&!q){r.push(c);rows.push(r);r=[];c="";}else if(ch!=='\r'||q){c+=ch;}}if(r.length||c){r.push(c);rows.push(r);}if(!rows.length)return jobs;const h=rows[0].map(hkey),seen=new Set();for(let i=1;i<rows.length;i++){const rw=rows[i];const status=cell(rw,h,['status']);const link=cell(rw,h,['link_status']);const linkKey=hkey(link);const featured=cell(rw,h,['feature','Featured','(Featured)'],8).toLowerCase()==="yes";if(status&&!['approved','live','active'].includes(hkey(status)))continue;if(['stale_by_date','outdated','date_expired'].includes(linkKey))continue;if(['expired','dead','missing_from_source','inactive','closed','not_found'].includes(linkKey))continue;const title=cell(rw,h,['Job Title','title'],0),studio=cell(rw,h,['Studio Name','studio'],1),location=cell(rw,h,['Location'],2),apply=cell(rw,h,['How to Apply','Apply URL','apply','source_url'],6),id=cell(rw,h,['job_id']);if(KNOWN_DEAD_APPLY_URLS.has(apply))continue;if(!rw||!title||!studio)continue;const key=hkey(title+'|'+studio+'|'+location);if(seen.has(key))continue;seen.add(key);jobs.push({id,title,studio,location,type:cell(rw,h,['Job Type','type'],3),mode:cell(rw,h,['Work Mode','mode'],4),desc:cell(rw,h,['Description','desc'],5),apply,posted:cell(rw,h,['Date Posted','posted'],7),featured,student:cell(rw,h,['Student Friendly','(Student Friendly)'],9).toLowerCase()==="yes",salary:cell(rw,h,['Salary'],10),engine:cell(rw,h,['Engine'],11),visa:cell(rw,h,['Visa Sponsorship','visa'],12)});}return jobs;}
 function cl(s){return s?s.trim():"";}
 function toSlug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
 function initFilters(){const cs=[...new Set(ALL.map(j=>j.location).filter(Boolean))].sort(),s=document.getElementById("f-city");s.innerHTML='<option value="">All cities</option>';cs.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o);});}
@@ -3855,7 +3862,7 @@ function submitPostForm(e){
   }).then(r=>r.json()).then(d=>{
     if(d.success){
       msg.className='form-msg show'; 
-      msg.innerHTML='<b>Submitted.</b> We will review the role before publishing. If you requested featured placement, send the $29 CAD Interac e-Transfer to <b>wupeiheng11@gmail.com</b> with the job title in the notes.';
+      msg.innerHTML='<b>Submitted.</b> We will review the role before publishing. If you requested featured placement, send the $29 CAD Interac e-Transfer to <b>wupeiheng11@gmail.com</b> with the job title in the notes. Featured placement payments are final and non-refundable once the listing is live.';
       toast('Job submitted. Email sent.','OK');
       form.reset();
     } else { throw 0; }
