@@ -4335,7 +4335,7 @@ function submitPostForm(e){
 }
 
 /* ═══════ SIGNUP & ALERTS ═══════ */
-function handleSignup(){const e=document.getElementById('signup-email').value;if(!e||!e.includes('@')){document.getElementById('signup-email').focus();return;}window.open('http://eepurl.com/jDQFL2','_blank');document.getElementById('signup-form').style.display='none';document.getElementById('signup-ok').classList.add('show');toast('You are on the list','');}
+function handleSignup(){const e=(document.getElementById('nl-email')||document.getElementById('signup-email')).value;if(!e||!e.includes('@')){(document.getElementById('nl-email')||document.getElementById('signup-email')).focus();return;}window.open('http://eepurl.com/jDQFL2','_blank');const sf=document.getElementById('signup-form');if(sf)sf.style.display='none';const ok=document.getElementById('signup-ok');if(ok)ok.classList.add('show');toast('You are on the list','');}
 function openAlertModal(){document.getElementById('alert-modal').classList.add('on');document.body.style.overflow='hidden';}
 function closeAlertModal(){document.getElementById('alert-modal').classList.remove('on');document.body.style.overflow='';}
 function handleAlertSignup(){const e=document.getElementById('alert-email').value;if(!e||!e.includes('@')){document.getElementById('alert-email').focus();return;}window.open('http://eepurl.com/jDQFL2','_blank');closeAlertModal();toast('Alerts enabled','');}
