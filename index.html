@@ -1998,7 +1998,7 @@ select {
   flex-direction: column;
 }
 #board-view.off { display: none; }
-#board-view > .hero { order: 1; }
+#board-view > .hero { order: 1; display: block !important; }
 #board-view > .controls { order: 2; }
 #board-view > .trust-bar { order: 3; }
 #board-view > #spotlight-s { order: 4; }
@@ -3771,7 +3771,7 @@ updBadge();
 async function loadJobs(){
   const url="https://docs.google.com/spreadsheets/d/"+SHEET_DOC_ID+"/gviz/tq?tqx=out:csv&sheet="+encodeURIComponent(LIVE_SHEET_NAME);
   try{const r=await fetch(url);if(!r.ok)throw 0;const csv=await r.text();ALL=parseCSV(csv);injectJobSchema(ALL);initFilters();updateStats();buildDashboard();updateLatestJobs();applyHash();render();buildTrusted();updateCompareTray();}
-  catch(e){console.error('Job Load Error:',e);document.getElementById("job-list").innerHTML='<div class="state-msg"><span class="ic">⚠️</span>Couldn\'t load jobs.<span class="sub">Please refresh or check back later.</span></div>';}
+  catch(e){console.error('Job Load Error:',e);document.getElementById("job-list").innerHTML='<div class="state-msg"><span class="ic">⚠️</span>Error: '+e.message+'<br><span class="sub">Please refresh or check back later.</span></div>';}
 }
 function hkey(s){return cl(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');}
 function cell(r,h,names,fallback){for(const n of names){const i=h.indexOf(hkey(n));if(i>-1)return cl(r[i]);}return fallback!==undefined?cl(r[fallback]):"";}
