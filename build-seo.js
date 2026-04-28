@@ -13,28 +13,6 @@ const KNOWN_DEAD_APPLY_URLS = new Set([
 ]);
 
 const SEO_TARGETS = [
-    { folder: 'vancouver', hash: '#city=Vancouver', title: 'Vancouver Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Vancouver, BC. No US roles. Salaries, entry-level, and remote roles included.' },
-    { folder: 'toronto', hash: '#city=Toronto', title: 'Toronto Game Dev Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Toronto, ON. No US roles.' },
-    { folder: 'montreal', hash: '#city=Montreal', title: 'Montreal Game Studio Jobs | Verified & Canadian - MapleDevs', desc: 'Find verified game dev jobs at studios located in Montreal, QC. Best opportunities in Canada.', title_fr: 'Emplois Studios de Jeux Montréal | MapleDevs', desc_fr: 'Trouvez des emplois vérifiés dans les studios de jeux à Montréal, QC. Meilleures opportunités au Canada.' },
-    { folder: 'ottawa', hash: '#city=Ottawa', title: 'Ottawa Game Dev Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Ottawa, ON.' },
-    { folder: 'quebec-city', hash: '#city=Quebec+City', title: 'Quebec City Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Quebec City, QC.', title_fr: 'Emplois Studios de Jeux Québec | MapleDevs', desc_fr: 'Trouvez des emplois vérifiés dans les studios de jeux à Québec, QC.' },
-    { folder: 'edmonton', hash: '#city=Edmonton', title: 'Edmonton Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Edmonton, AB.' },
-    { folder: 'calgary', hash: '#city=Calgary', title: 'Calgary Game Dev Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Calgary, AB.' },
-    { folder: 'victoria', hash: '#city=Victoria', title: 'Victoria Game Dev Jobs | BC Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Victoria, BC.' },
-    { folder: 'london', hash: '#city=London', title: 'London Ontario Game Dev Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in London, ON.' },
-    { folder: 'halifax', hash: '#city=Halifax', title: 'Halifax Game Dev Jobs | Nova Scotia - MapleDevs', desc: 'Find verified game dev jobs at studios located in Halifax, NS.' },
-    { folder: 'kitchener', hash: '#city=Kitchener', title: 'Kitchener Waterloo Game Jobs | Ontario - MapleDevs', desc: 'Find verified game dev jobs at studios located in Kitchener-Waterloo, ON.' },
-    { folder: 'burnaby', hash: '#city=Burnaby', title: 'Burnaby BC Game Studio Jobs | Canada - MapleDevs', desc: 'Find verified game dev jobs at studios located in Burnaby, BC.' },
-    { folder: 'programming', hash: '#role=programming', title: 'Game Programming & Engineering Jobs Canada - MapleDevs', desc: 'Find C++, Unity, Unreal, and general programming jobs at Canadian game studios.' },
-    { folder: 'art', hash: '#role=art', title: 'Game Art & Animation Jobs Canada - MapleDevs', desc: 'Discover 2D, 3D, UI, and VFX artist jobs at verified game studios operating across Canada.' },
-    { folder: 'design', hash: '#role=design', title: 'Game Design & Level Design Jobs Canada - MapleDevs', desc: 'Find game design, level design, and narrative design jobs at Canadian studios.' },
-    { folder: 'producer', hash: '#role=production', title: 'Game Producer & Production Jobs Canada - MapleDevs', desc: 'Find game producer, project manager, and production jobs at Canadian studios.' },
-    { folder: 'qa', hash: '#role=qa', title: 'Game QA & Testing Jobs Canada - MapleDevs', desc: 'Find quality assurance, game testing, and QA lead jobs at Canadian studios.' },
-    { folder: 'audio', hash: '#role=audio', title: 'Game Audio & Sound Design Jobs Canada - MapleDevs', desc: 'Find sound design, music, and audio engineering jobs at Canadian game studios.' },
-    { folder: 'ui-ux', hash: '#role=design', title: 'Game UI & UX Design Jobs Canada - MapleDevs', desc: 'Find UI/UX design and user research jobs at Canadian game studios.' },
-    { folder: 'junior', hash: '#exp=junior', title: 'Junior & Entry-Level Game Dev Jobs Canada - MapleDevs', desc: 'Break into the Canadian games industry. Browse verified entry-level and junior roles.' },
-    { folder: 'remote', hash: '#mode=Remote', title: 'Remote Game Dev Jobs Canada | Work From Home - MapleDevs', desc: 'Find 100% remote game developer jobs at studios operating in Canada.' },
-    { folder: 'internship', hash: '#type=Internship', title: 'Game Development Internships Canada | Student Jobs - MapleDevs', desc: 'Find game dev internships, co-ops, and student roles at Canadian game studios.' },
     { folder: 'about', hash: '#about', title: 'About MapleDevs | Canada\'s Game Industry Job Board', desc: 'Why we built MapleDevs and how we are helping Canadian game developers find local opportunities.' },
     { folder: 'studios', hash: '#studios', title: 'Top Canadian Game Studios Hiring Now | MapleDevs', desc: 'Browse the directory of Canadian game studios currently hiring. Vancouver, Montreal, Toronto and more.' },
     { folder: 'saved', hash: '#saved', title: 'Your Saved Jobs | MapleDevs', desc: 'Manage your bookmarked game industry opportunities in Canada.' }
