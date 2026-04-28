@@ -15,7 +15,8 @@ const KNOWN_DEAD_APPLY_URLS = new Set([
 const SEO_TARGETS = [
     { folder: 'about', hash: '#about', title: 'About MapleDevs | Canada\'s Game Industry Job Board', desc: 'Why we built MapleDevs and how we are helping Canadian game developers find local opportunities.' },
     { folder: 'studios', hash: '#studios', title: 'Top Canadian Game Studios Hiring Now | MapleDevs', desc: 'Browse the directory of Canadian game studios currently hiring. Vancouver, Montreal, Toronto and more.' },
-    { folder: 'saved', hash: '#saved', title: 'Your Saved Jobs | MapleDevs', desc: 'Manage your bookmarked game industry opportunities in Canada.' }
+    { folder: 'saved', hash: '#saved', title: 'Your Saved Jobs | MapleDevs', desc: 'Manage your bookmarked game industry opportunities in Canada.' },
+    { folder: 'resources', hash: '#resources', title: 'Best Tools & Resources for Game Developers in Canada | MapleDevs', desc: 'Curated tools, courses, and resources to help you improve your skills and get hired in the Canadian game industry.' }
 ];
 
 const NOINDEX_FOLDERS = new Set(['saved']);
@@ -503,7 +504,7 @@ async function build() {
         else if (p.has('type')) targetJobs = jobs.filter(j => (j.type || '').toLowerCase().includes(p.get('type').toLowerCase()) || j.title.toLowerCase().includes(p.get('type').toLowerCase()));
 
         const pageTarget = { ...target };
-        if (targetJobs.length && !['about', 'studios', 'saved'].includes(target.folder)) {
+        if (targetJobs.length && !['about', 'studios', 'saved', 'resources'].includes(target.folder)) {
             pageTarget.desc = truncate(`${targetJobs.length} current Canadian game industry role${targetJobs.length === 1 ? '' : 's'} matching this hub. ${target.desc}`, 160);
         }
         const html = injectSEO(baseHTML, pageTarget, targetJobs.slice(0, 10)); // Top 10 for SEO

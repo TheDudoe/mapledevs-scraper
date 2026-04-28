@@ -1,0 +1,85 @@
+[
+  {
+    "title": "Learn Unreal Engine",
+    "description": "The official learning portal for Unreal Engine, featuring hundreds of hours of free tutorials and learning paths.",
+    "link": "https://dev.epicgames.com/community/unreal-engine/learning",
+    "category": "Learn",
+    "icon": "🎮",
+    "tags": ["Free", "Official"]
+  },
+  {
+    "title": "Unity Learn",
+    "description": "Structured pathways to master game development with the Unity engine, from beginner to advanced.",
+    "link": "https://learn.unity.com/",
+    "category": "Learn",
+    "icon": "🕹️",
+    "tags": ["Free", "Official"]
+  },
+  {
+    "title": "GameDev.tv Courses",
+    "description": "Highly rated courses for C++, C#, Unity, Unreal, and Blender. Great for practical project-based learning.",
+    "link": "https://www.gamedev.tv/",
+    "category": "Learn",
+    "icon": "🎓",
+    "tags": ["Paid", "Course"]
+  },
+  {
+    "title": "Quixel Megascans",
+    "description": "A massive library of high-quality 3D scans, textures, and assets. Free for use with Unreal Engine.",
+    "link": "https://quixel.com/megascans/",
+    "category": "Tools",
+    "icon": "🧱",
+    "tags": ["Free", "Assets"]
+  },
+  {
+    "title": "ArtStation",
+    "description": "The leading showcase platform for games, media & entertainment artists. Essential for portfolios.",
+    "link": "https://www.artstation.com/",
+    "category": "Tools",
+    "icon": "🖼️",
+    "tags": ["Free", "Portfolio"]
+  },
+  {
+    "title": "GitHub for Gamedev",
+    "description": "Version control is essential. Learn how to manage large binary files with Git LFS.",
+    "link": "https://github.com/",
+    "category": "Tools",
+    "icon": "🐙",
+    "tags": ["Free", "DevOps"]
+  },
+  {
+    "id": "resume",
+    "title": "Game Industry Resume Guide",
+    "description": "How to structure your resume specifically for game studios. Tips from recruiters and leads.",
+    "link": "#",
+    "category": "Career",
+    "icon": "📄",
+    "tags": ["New", "Guide"]
+  },
+  {
+    "id": "interview",
+    "title": "Interview Prep Kit",
+    "description": "Common technical and behavioral questions asked during Canadian game studio interviews.",
+    "link": "#",
+    "category": "Career",
+    "icon": "🎤",
+    "tags": ["New", "Guide"]
+  },
+  {
+    "id": "portfolio",
+    "title": "Portfolio Review Checklist",
+    "description": "Ensure your portfolio hits the marks that hiring managers in Canada are looking for.",
+    "link": "#",
+    "category": "Career",
+    "icon": "✅",
+    "tags": ["Guide"]
+  },
+  {
+    "title": "Canadian Gamedev Discord",
+    "description": "Join our community of developers in Canada. Network, share work, and find opportunities.",
+    "link": "https://discord.com/invite/TXGyQYRYg9",
+    "category": "Featured",
+    "icon": "🍁",
+    "tags": ["Community", "Free"]
+  }
+]
