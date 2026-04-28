@@ -42,42 +42,7 @@
   }
 }
 </script>
-<script>
-  (function(h,o,u,n,d) {
-    h = h[d] = h[d] || { q: [], onReady: function (c) { h.q.push(c); } };
-    d = o.createElement(u);
-    d.async = 1;
-    d.src = n;
-    d.crossOrigin = 'anonymous';
-    n = o.getElementsByTagName(u)[0];
-    n.parentNode.insertBefore(d, n);
-  })(window, document, 'script', 'https://www.datadoghq-browser-agent.com/us5/v6/datadog-rum.js', 'DD_RUM');
-  window.DD_RUM.onReady(function () {
-    window.DD_RUM.init({
-      applicationId: 'fac714c5-9145-479b-8e8b-9b5200e4a5a1',
-      clientToken: 'pub4e371293c377f9ebb8d29cf402719cc4',
-      site: 'us5.datadoghq.com',
-      service: 'mapledevs-web',
-      env: 'production',
-      version: '1.0.2',
-      sessionSampleRate: 100,
-      sessionReplaySampleRate: 20,
-      trackResources: true,
-      trackLongTasks: true,
-      trackUserInteractions: true,
-      defaultPrivacyLevel: 'mask-user-input'
-    });
-  });
-</script>
-<script>
-  !function(t,e){var o,n,p,r;e.__SV||(window.posthog&&window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Ai Ri init Vi Yi Rr zi Gi Zi capture calculateEventProperties en register register_once register_for_session unregister unregister_for_session sn getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync an identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty rn Ki createPersonProfile setInternalOrTestUser nn $i hn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Xi debug Mr tn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-  posthog.init('phc_vVQhxGSYD6WgW6mLhYZrGkpGirfaPoS6pk46xunZ6E5g', {
-    api_host: 'https://us.i.posthog.com',
-    defaults: '2026-01-30',
-    person_profiles: 'identified_only',
-    capture_pageview: false
-  });
-</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
@@ -97,8 +62,8 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   --maple-light: #E8564C;
   --maple-glow: rgba(200, 55, 45, 0.12);
   --maple-gradient: linear-gradient(135deg, #C8372D 0%, #E8564C 50%, #D44A3F 100%);
-  --gold: #E8C94A;
-  --gold-glow: rgba(232, 201, 74, 0.15);
+  --gold: #FFC800;
+  --gold-glow: rgba(255, 200, 0, 0.15);
   --forest: #2A5C45;
   --forest-light: #EAF3EE;
   --forest-mid: #5A9E7A;
@@ -287,7 +252,7 @@ header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0
 .ctrl-inner { max-width: var(--max-w); margin: 0 auto; display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
 .s-wrap { flex: 1; min-width: 180px; position: relative; }
 .s-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; transition: color var(--dur); }
-.s-wrap input { width: 100%; padding: 9px 12px 9px 38px; font-family: inherit; font-size: 13px; border: 1px solid var(--border-s); border-radius: var(--r-s); background: var(--bg-input); color: var(--text-1); outline: none; transition: all var(--dur); min-height: 38px; }
+.s-wrap input { width: 100%; padding: 10px 12px 10px 44px !important; font-family: inherit; font-size: 13px; border: 1px solid var(--border-s); border-radius: var(--r-s); background: var(--bg-input); color: var(--text-1); outline: none; transition: all var(--dur); min-height: 40px; }
 .s-wrap input::placeholder { color: var(--text-3); }
 .s-wrap input:focus { border-color: var(--maple); box-shadow: 0 0 0 3px var(--maple-glow); }
 .s-key { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-3); background: var(--bg-subtle); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-family: monospace; pointer-events: none; transition: opacity var(--dur); }
@@ -342,7 +307,7 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.25rem 1.5rem 4rem; }
 
 .jc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 .jc-title-grp { flex: 1; }
-.jc-title { font-size: 1.05rem; font-weight: 750; color: var(--text-1); line-height: 1.3; margin-bottom: 2px; }
+.jc-title { font-size: 0.95rem; font-weight: 700; color: var(--text-1); line-height: 1.2; margin-bottom: 2px; }
 .jc-acts { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .jc-badges { display: flex; gap: 4px; margin-bottom: 8px; }
 
@@ -374,6 +339,14 @@ main { max-width: var(--max-w); margin: 0 auto; padding: 1.25rem 1.5rem 4rem; }
 .p-hybrid { background: rgba(251,188,4,0.08); color: #FBBC04; border-color: rgba(251,188,4,0.15); }
 .p-onsite { background: var(--forest-light); color: var(--forest); }
 .p-stu { background: rgba(167,82,242,0.08); color: #A752F2; border-color: rgba(167,82,242,0.15); }
+
+/* Mini Job Card Styles */
+.jc-score-mini { font-size: 11px; font-weight: 800; color: var(--gold); background: var(--gold-glow); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(232,201,74,0.2); }
+.jc-meta-mini { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); margin-top: 4px; }
+.jc-meta-mini .dot { opacity: 0.4; }
+.jc-salary-mini { color: var(--maple); font-weight: 600; }
+.jc-date-mini { font-size: 11px; color: var(--text-3); margin-top: 8px; opacity: 0.8; }
+.jc.active { border-color: var(--maple); box-shadow: 0 0 0 2px var(--maple-glow); }
 .p-sal { font-weight: 800; color: var(--maple); border-color: var(--maple-glow); background: var(--maple-glow); }
 .p-engine { background: rgba(42,92,69,0.08); color: var(--forest); border-color: rgba(42,92,69,0.16); }
 .p-visa { background: var(--maple-glow); color: var(--maple); border-color: rgba(200,55,45,0.22); }
@@ -1970,26 +1943,39 @@ header::after { display: none; }
 }
 .ctrl-inner {
   display: grid;
-  grid-template-columns: minmax(240px, 1.65fr) repeat(4, minmax(130px, 1fr)) auto auto;
+  grid-template-columns: minmax(260px, 1.8fr) repeat(auto-fit, minmax(130px, 1fr));
   gap: 8px;
+  align-items: center;
 }
 .s-wrap input,
-select {
-  min-height: 42px;
+select,
+.stu-label,
+.alert-btn {
+  min-height: 40px;
+  height: 40px;
   border-radius: var(--r-s);
   background: var(--bg-card);
   font-size: 13px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+select {
+  border: 1px solid var(--border-s);
+  cursor: pointer;
+  width: 100%;
 }
 .stu-label {
   border: 1px solid var(--border-s);
-  background: var(--bg-card);
-  padding: 0 10px;
+  white-space: nowrap;
+  gap: 8px;
 }
 .alert-btn {
-  min-height: 42px;
   background: #111820;
   color: #fff;
-  border-color: #111820;
+  border: 1px solid #111820;
+  justify-content: center;
+  font-weight: 600;
 }
 .alert-btn:hover { background: var(--maple); border-color: var(--maple); }
 .f-pills { max-width: var(--max-w); padding-left: 0; padding-right: 0; }
@@ -2085,15 +2071,12 @@ select {
 .sort-pill.active { color: var(--maple); border-color: rgba(200,55,45,0.24); background: var(--maple-glow); }
 
 .jc {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(190px, 240px);
-  gap: 18px;
-  align-items: stretch;
+  display: block;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r);
   box-shadow: var(--shadow-s);
-  padding: 18px;
+  padding: 16px;
 }
 .jc::before,
 .jc::after { display: none; }
@@ -2685,35 +2668,79 @@ select {
 
 .split-layout { display: flex; gap: 24px; align-items: flex-start; }
 .list-col { flex: 4; min-width: 0; }
-.detail-col { display: none; width: 55%; flex: 5.5; position: sticky; top: calc(var(--header-h) + 85px); height: calc(100vh - var(--header-h) - 105px); background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-m); flex-direction: column; overflow: hidden; z-index: 50; }
-@media (min-width: 900px) { .detail-col { display: flex; } }
-.inline-detail-empty { padding: 80px 20px; text-align: center; color: var(--text-3); font-size: 1.1rem; flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-.detail-col .d-card { box-shadow: none; border: none; margin: 0; padding: 0; overflow: visible; }
-.jc.active { border-color: var(--maple); background: var(--bg-elevated); }
 
+/* ═══════ DETAIL PANE (INLINE) ═══════ */
+#inline-detail-pane {
+  display: none;
+  width: 55%;
+  flex: 5.5;
+  position: sticky;
+  top: calc(var(--header-h) + 85px);
+  height: calc(100vh - var(--header-h) - 105px);
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-m) !important;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 50;
+  box-sizing: border-box;
+}
+.detail-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 24px !important;
+  min-height: 0;
+}
+@media (min-width: 900px) { #inline-detail-pane { display: flex !important; } }
+
+#inline-detail-pane .detail-header {
+  flex-shrink: 0 !important;
+  padding: 32px 24px 20px !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  position: relative !important;
+  min-height: 100px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+#inline-detail-pane .detail-header .d-title {
+  font-family: 'DM Serif Display', serif !important;
+  font-size: 24px !important;
+  line-height: 1.4 !important;
+  color: var(--text-1) !important;
+  margin: 0 0 4px !important;
+  padding: 0 160px 0 0 !important;
+  display: block !important;
+}
+#inline-detail-pane .detail-header .d-studio {
+  font-size: 15px !important;
+  color: var(--text-2) !important;
+  margin: 0 !important;
+}
+#inline-detail-pane .jc-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  margin: 1.5rem auto !important;
+  width: 100% !important;
+  max-width: 480px !important;
+}
+#inline-detail-pane .meta-item {
+  flex: 0 1 140px !important;
+  text-align: left !important;
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--border) !important;
+}
+.inline-detail-empty { padding: 80px 20px; text-align: center; color: var(--text-3); font-size: 1.1rem; flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.jc.active { border-color: var(--maple) !important; background: var(--bg-elevated) !important; box-shadow: 0 0 0 2px var(--maple-glow) !important; }
 
 .about-reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 .about-reveal.visible { opacity: 1; transform: translateY(0); }
 .about-card { transition: transform 0.3s; }
 .about-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-m); border-color: var(--maple); }
-
-
-.detail-col .detail-header {
-  flex-shrink: 0;
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-card);
-  position: relative;
-}
-.detail-col .detail-header .d-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 26px;
-  line-height: 1.1;
-  color: var(--text-1);
-  margin-bottom: 6px;
-  padding-right: 130px; /* Space for apply button */
-  letter-spacing: -0.01em;
-}
 .detail-col .detail-header .d-studio {
   font-size: 15px;
   color: var(--text-2);
@@ -2722,12 +2749,13 @@ select {
 }
 .detail-col .detail-apply-btn {
   position: absolute;
-  top: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   right: 1.5rem;
   background: var(--maple);
   color: #fff;
-  padding: 10px 20px;
-  border-radius: 100px; /* Pill shape for premium look */
+  padding: 10px 22px;
+  border-radius: 100px;
   font-weight: 700;
   font-size: 14px;
   text-decoration: none;
@@ -2736,9 +2764,10 @@ select {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 .detail-col .detail-apply-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(calc(-50% - 2px));
   box-shadow: 0 6px 16px rgba(200, 55, 45, 0.3);
   filter: brightness(1.1);
 }
@@ -2754,17 +2783,14 @@ select {
   display: none;
 }
 /* Adjust padding for d-hdr when title is hidden */
-.detail-col .detail-body .d-hdr {
-  padding-top: 0;
-  margin-top: 0;
+#inline-detail-pane .detail-body .d-hdr {
+  text-align: center !important;
+  padding-bottom: 1.5rem !important;
+  border-bottom: 1px solid var(--border) !important;
 }
-.pill { justify-content: center; text-align: center; }
-
+/* Timestamp: 2026-04-27T20:47:00Z */
 </style>
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-DPWQMPD0ZC"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DPWQMPD0ZC');</script>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -2813,7 +2839,7 @@ select {
     <div class="modal-hdr">
       <div>
         <h2 id="post-modal-title">Post a Job on MapleDevs</h2>
-        <p>Standard listings are free. Featured placement starts at <b>$19 CAD</b>.</p>
+        <p>Standard listings are free. Featured placement available to boost visibility.</p>
         <p style="font-size:12px;color:var(--text-3);margin-top:6px;"><strong style="color:var(--text-2)">Featured payment via Interac e-Transfer:</strong> <a href="mailto:wupeiheng11@gmail.com" style="color:var(--maple);text-decoration:underline;">wupeiheng11@gmail.com</a></p>
         <p style="font-size:12px;color:var(--text-3);margin-top:6px;">Featured placement payments are final and non-refundable once the listing is live.</p>
       </div>
@@ -2955,7 +2981,7 @@ select {
         </form>
         <div class="hero-cta">
           <a href="#main-content" class="btn-p" id="browse-btn">Browse Jobs</a>
-          <button class="btn-feature" onclick="window.location.href='/hire/index.html'">★ Boost Your Job — $39</button>
+          <button class="btn-feature" onclick="window.location.href='/hire/index.html'">★ Boost Your Job</button>
         </div>
         <div class="hero-stats" role="region" aria-label="MapleDevs statistics">
           <div><span class="stat-n" id="s-jobs" data-t="0">0</span><div class="stat-l">Open roles</div></div>
@@ -2970,7 +2996,7 @@ select {
           <a href="/#mode=Remote"><span>Remote and hybrid roles</span><b>Browse</b></a>
           <a href="/#exp=junior"><span>Junior and student pathways</span><b>Find</b></a>
           <a href="/#role=programming"><span>Programming and engine roles</span><b>Explore</b></a>
-          <a href="/hire/index.html"><span>Featured listing price</span><b>$19 CAD</b></a>
+          <a href="/hire/index.html"><span>Featured listing price</span><b>See tiers</b></a>
         </div>
         <div class="signal-engine" aria-label="Animated hiring signal visualization">
           <span class="signal-sweep"></span>
@@ -3172,7 +3198,7 @@ select {
         <div class="community-panel">
           <span class="quote-label">Studio promise</span>
           <h3>Reach people who already want Canadian game jobs.</h3>
-          <p>Studios get a focused audience without changing monetization: standard listings stay free, and featured placement starts at $19 CAD.</p>
+          <p>Studios get a focused audience without changing monetization: standard listings stay free, and featured placement is available for better reach.</p>
         </div>
         <div class="community-panel">
           <span class="quote-label">Collect real quotes</span>
@@ -3407,7 +3433,7 @@ select {
   <section class="about-cta about-reveal">
     <h2>Hiring at a Canadian game studio?</h2>
     <p>Use the job submission form or email <a href="mailto:mapledevsbusiness@gmail.com">mapledevsbusiness@gmail.com</a>.</p>
-    <div class="about-price">Standard listings are <b>free</b>. Paid tiers start at <b>$19 CAD</b>, payable by Interac e-Transfer to <b>wupeiheng11@gmail.com</b>. Payments are non-refundable once live.</div>
+    <div class="about-price">Standard listings are <b>free</b>. Paid tiers are available for featured placement, payable by Interac e-Transfer to <b>wupeiheng11@gmail.com</b>. Payments are non-refundable once live.</div>
   </section>
 
   <div id="about-platform-sections" class="about-platform-sections" aria-label="More about MapleDevs"></div>
@@ -3440,29 +3466,21 @@ select {
   <h1>Privacy <em>Policy</em></h1>
   <p style="font-size:12px; color:var(--text-3); margin-bottom:1.5rem;">Last updated: April 26, 2026</p>
   
-  <h2>1. Who we are</h2>
-  <p>MapleDevs (mapledevs.ca) is Canada's #1 game industry job board. We are a Canadian-owned and operated platform dedicated to helping talent find roles at verified Canadian studios. You can contact us at <a href="mailto:mapledevsbusiness@gmail.com">mapledevsbusiness@gmail.com</a>.</p>
+  <h2>1. Privacy First Approach</h2>
+  <p>MapleDevs is built with a privacy-first mindset. We do not use third-party tracking scripts like Google Analytics, Datadog RUM, or PostHog. Your browsing behavior remains yours. We only collect data that is strictly necessary to provide our service.</p>
   
-  <h2>2. Data we collect</h2>
-  <p><strong>For Job Seekers:</strong> We do not require account creation to browse jobs. If you create an account, we store the profile, resume, saved job, and studio/candidate information you choose to provide. Candidate profiles stay private unless you mark them Public for the MapleDevs Talent Directory. Public directory pages do not show login email addresses. We collect your email address if you voluntarily sign up for our newsletter or job alerts. Basic usage data is collected via Google Analytics, Datadog RUM, and PostHog to help us improve the platform.</p>
-  <p><strong>For Employers:</strong> We collect your name, studio email, and job details when you submit a listing. We do <strong>not</strong> collect or store credit card or banking information. All payments for featured listings are handled externally via Interac e-Transfer.</p>
+  <h2>2. Information We Collect</h2>
+  <p><strong>Job Seekers:</strong> We do not require an account to browse jobs. If you choose to create a profile or sign up for alerts, we store your email and the professional details you voluntarily provide. This data is never sold or shared with advertisers.</p>
+  <p><strong>Employers:</strong> We collect studio contact information and job details to verify and publish your listings. Payment information for featured roles is never stored on our servers as all transactions occur via manual Interac e-Transfer.</p>
   
   <h2>3. Automated Data Collection</h2>
-  <p>We aggregate job listings from official studio career pages (via Greenhouse, Lever, and other ATS platforms). This information is publicly available and we process it to provide a centralized hub for Canadian developers. If you are a studio owner and wish to have your listings removed or updated, please contact us.</p>
+  <p>We aggregate job listings from official studio career pages. This information is publicly available and we process it to provide a centralized hub for Canadian developers. If you are a studio owner and wish to have your listings removed or updated, please contact us at <a href="mailto:mapledevsbusiness@gmail.com">mapledevsbusiness@gmail.com</a>.</p>
   
-  <h2>4. Third-Party Services</h2>
-  <p>We use the following services to power MapleDevs:</p>
-  <ul>
-    <li><strong>Google Analytics:</strong> To understand site traffic (anonymous).</li>
-    <li><strong>Datadog RUM:</strong> To monitor frontend errors, page performance, and user experience. Form input is masked by default.</li>
-    <li><strong>PostHog:</strong> To understand page views, feature usage, and product flow across MapleDevs.</li>
-    <li><strong>Mailchimp:</strong> To manage our newsletter and job alert emails.</li>
-    <li><strong>Google Sheets:</strong> To securely store our job database.</li>
-    <li><strong>Discord:</strong> Our community the hub is hosted on Discord, which has its own privacy policy.</li>
-  </ul>
+  <h2>4. Studio Verification & Trust</h2>
+  <p>MapleDevs is committed to maintaining a high-trust environment. Every studio listed on our platform is manually verified by our team to ensure they have a legitimate operational presence in Canada. We do not allow 'ghost jobs', unpaid roles (excluding internships), or deceptive listings. We regularly audit our database to ensure all links and details remain accurate and fresh.</p>
   
   <h2>5. Your Rights</h2>
-  <p>You have the right to request the deletion of your email from our newsletter at any time using the "Unsubscribe" link in any email, or by contacting us directly. We do not sell or trade your personal data with third parties.</p>
+  <p>You have the right to request the deletion of your data or unsubscribe from our newsletter at any time. We are a Canadian-owned platform and comply with relevant privacy standards to protect your information.</p>
 </div></div>
 
 <!-- ═══════ TERMS VIEW ═══════ -->
@@ -3481,7 +3499,7 @@ select {
   <p>MapleDevs is free for job seekers. We provide links to external application portals. We are not responsible for the content of external sites, nor are we involved in the hiring process or decisions made by studios.</p>
   
   <h2>4. For Employers & Payments</h2>
-  <p>Standard job listings are currently free. <strong>Paid Listings</strong> are available starting from <strong>$19 CAD</strong>. Paid roles stay at the top of the board, receive priority in our newsletter, and are highlighted on social media. 
+  <p>Standard job listings are currently free. <strong>Paid Listings</strong> are available for featured placement. Paid roles stay at the top of the board, receive priority in our newsletter, and are highlighted on social media. 
   <br><br>Payments must be sent via <strong>Interac e-Transfer</strong> to <a href="mailto:wupeiheng11@gmail.com">wupeiheng11@gmail.com</a>. Listings are published/featured only after payment is confirmed. All sales are final and non-refundable once the listing is live.</p>
   
   <h2>5. Featured Listing Refund Policy</h2>
@@ -3499,12 +3517,11 @@ select {
   <section class="ft-discovery">
     <div class="ft-disc-in">
       <div class="ft-col">
-        <h4>Categories</h4>
+        <h4>Legal</h4>
         <ul>
-          <li><a href="/#exp=junior">Junior Roles</a></li>
-          <li><a href="/#mode=Remote">Remote Jobs</a></li>
-          <li><a href="/#type=Internship">Internships</a></li>
-          <li><a href="/#exp=senior">Senior Roles</a></li>
+          <li><button onclick="showPrivacy()" style="background:none;border:none;color:var(--text-2);font:inherit;cursor:pointer;padding:0;text-align:left;">Privacy Policy</button></li>
+          <li><button onclick="showTerms()" style="background:none;border:none;color:var(--text-2);font:inherit;cursor:pointer;padding:0;text-align:left;">Terms of Use</button></li>
+          <li><a href="/contact/">Contact Us</a></li>
         </ul>
       </div>
       <div class="ft-col">
@@ -3583,10 +3600,29 @@ document.getElementById('theme-btn').onclick=togTheme;
 (function(){const bg=document.getElementById('hero-bg'); if(bg) bg.setAttribute('aria-hidden','true');})();
 
 /* ═══════ COUNTER ═══════ */
-function animC(el,target){if(!target){el.textContent='0';return;}const dur=1000,st=performance.now();(function t(now){const p=Math.min((now-st)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(t);})(performance.now());}
+function animC(el,target){
+  if(!el) return;
+  if(!target){el.textContent='0';return;}
+  const dur=1000,st=performance.now();
+  (function t(now){
+    const p=Math.min((now-st)/dur,1);
+    el.textContent=Math.round(target*(1-Math.pow(1-p,3)));
+    if(p<1)requestAnimationFrame(t);
+  })(performance.now());
+}
 let statsAni=false;
-const sObs=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting&&!statsAni&&ALL.length){statsAni=true;animC(document.getElementById('s-jobs'),ALL.length);animC(document.getElementById('s-studios'),new Set(ALL.map(j=>j.studio)).size);animC(document.getElementById('s-cities'),new Set(ALL.map(j=>j.location).filter(Boolean)).size);}});},{threshold:0.3});
-sObs.observe(document.querySelector('.hero-stats'));
+const sObs=new IntersectionObserver(e=>{
+  e.forEach(en=>{
+    if(en.isIntersecting&&!statsAni&&ALL.length){
+      statsAni=true;
+      animC(document.getElementById('s-jobs'),ALL.length);
+      animC(document.getElementById('s-studios'),new Set(ALL.map(j=>j.studio)).size);
+      animC(document.getElementById('s-cities'),new Set(ALL.map(j=>j.location).filter(Boolean)).size);
+    }
+  });
+},{threshold:0.3});
+const statsEl = document.querySelector('.hero-stats');
+if(statsEl) sObs.observe(statsEl);
 
 /* ═══════ TOAST ═══════ */
 function toast(msg,ic='✓'){const c=document.getElementById('toast-c'),t=document.createElement('div');t.className='toast';t.innerHTML=(ic?'<span>'+ic+'</span> ':'')+esc(msg);c.appendChild(t);setTimeout(()=>{t.classList.add('exit');setTimeout(()=>t.remove(),200);},2600);}
@@ -3830,7 +3866,24 @@ function cl(s){return s?s.trim():"";}
 function toSlug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
 function initFilters(){const cs=[...new Set(ALL.map(j=>j.location).filter(Boolean))].sort(),s=document.getElementById("f-city");s.innerHTML='<option value="">All cities</option>';cs.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;s.appendChild(o);});}
 function setText(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
-function updateStats(){const jc=ALL.length,sc=new Set(ALL.map(j=>j.studio)).size,cc=new Set(ALL.map(j=>j.location).filter(Boolean)).size;setText('premium-role-count',jc);setText('premium-studio-count',sc);setText('premium-city-count',cc);if(!statsAni){statsAni=true;animC(document.getElementById('s-jobs'),jc);animC(document.getElementById('s-studios'),sc);animC(document.getElementById('s-cities'),cc);}}
+function updateStats(){
+  const jc=ALL.length,sc=new Set(ALL.map(j=>j.studio)).size,cc=new Set(ALL.map(j=>j.location).filter(Boolean)).size;
+  setText('premium-role-count',jc);
+  setText('premium-studio-count',sc);
+  setText('premium-city-count',cc);
+  
+  if(!statsAni){
+    const sJobs = document.getElementById('s-jobs');
+    const sStudios = document.getElementById('s-studios');
+    const sCities = document.getElementById('s-cities');
+    if(sJobs || sStudios || sCities) {
+      statsAni=true;
+      animC(sJobs, jc);
+      animC(sStudios, sc);
+      animC(sCities, cc);
+    }
+  }
+}
 function injectJobSchema(jobs){const jld=jobs.map(j=>({"@context":"https://schema.org/","@type":"JobPosting","title":j.title,"description":j.desc||"Opportunity at "+j.studio,"datePosted":j.posted?new Date(j.posted).toISOString():new Date().toISOString(),"validThrough":new Date(Date.now()+30*24*60*60*1000).toISOString(),"employmentType":j.type?j.type.toUpperCase().replace("-","_"):"FULL_TIME","hiringOrganization":{"@type":"Organization","name":j.studio,"logo":"https://mapledevs.ca/og-image.png"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":j.location||"Canada","addressCountry":"CA"}},"jobLocationType":(j.mode||"").toLowerCase().includes("remote")?"TELECOMMUTE":undefined,"applicantLocationRequirements":(j.mode||"").toLowerCase().includes("remote")?{"@type":"Country","name":"Canada"}:undefined}));const el=document.getElementById("job-schema-dynamic");if(el)el.remove();const s=document.createElement("script");s.id="job-schema-dynamic";s.type="application/ld+json";s.text=JSON.stringify(jld);document.head.appendChild(s);}
 function buildTrusted(){const studios=[...new Set(ALL.map(j=>j.studio))].slice(0,12);const el=document.getElementById('trusted-logos');if(!el)return;el.innerHTML=studios.map(s=>'<span class="trusted-name">'+esc(s)+'</span>').join('');}
 
@@ -4136,54 +4189,29 @@ function hl(text,q){if(!q)return esc(text);const e=esc(text),qe=esc(q);const rx=
 
 /* ═══════ CARD ═══════ */
 function cardHTML(j,ri,ai){
-  const q=document.getElementById('search').value.toLowerCase(),sv=isSaved(j),cmp=isCompared(j),dl=Math.min(ai*25,250);
+  const q=document.getElementById('search').value.toLowerCase(), dl=Math.min(ai*25,250);
   const hot = isHot(j);
   const score = signalScore(j);
-  const badges=(j.featured?'<span class="b-feat">Featured</span>':'')+(isNew(j.posted)?'<span class="b-new">New</span>':'')+(hot && !j.featured?'<span class="b-new" style="background:rgba(255,100,35,0.1);color:#FF6423;border-color:rgba(255,100,35,0.2)">Active</span>':'');
-  const facts=[
-    metaItem('Location',j.location||'Canada'),
-    metaItem('Work mode',j.mode||'Not listed'),
-    metaItem('Salary',j.salary||'Not listed','salary')
-  ].join('');
-  const salary = j.salary || 'Salary not listed';
-  const applyAction = j.apply ? `<a href="${esc(j.apply)}" target="_blank" rel="noopener" class="btn-p" onclick="trackApply(event);event.stopPropagation()">Apply</a>` : '';
+  const badges=(j.featured?'<span class="b-feat">Featured</span>':'')+(isNew(j.posted)?'<span class="b-new">New</span>':'');
   
   return `<div class="jc${j.featured?' feat':''}${hot?' hot':''} scroll-in" style="animation-delay:${dl}ms" onclick="openDet(${ri},event)" tabindex="0" role="article" onkeydown="if(event.key==='Enter')openDet(${ri})" aria-label="${esc(j.title)} at ${esc(j.studio)}">
     <div class="jc-main">
-      <div class="jc-top">
-        <div class="jc-title-grp">
-          ${badges ? `<div class="jc-badges">${badges}</div>` : ''}
-          <div class="jc-title">${hl(j.title,q)}</div>
+      <div class="jc-top" style="margin-bottom: 2px;">
+        <div class="jc-title-grp" style="flex: 1; padding-right: 8px;">
+          <div class="jc-title" style="font-size: 1.1rem; line-height: 1.2;">${hl(j.title,q)}</div>
+          ${badges ? `<div class="jc-badges" style="margin-top: 4px; margin-bottom: 0;">${badges}</div>` : ''}
         </div>
+        <div class="jc-score-mini" title="Signal Score">${score}</div>
       </div>
       <div class="jc-studio">${hl(j.studio,q)}</div>
-      <div class="jc-meta">${facts}</div>
-      <div class="jc-pills">
-        ${j.type ? `<span class="pill p-type">${esc(j.type)}</span>` : ''}
-        ${j.engine ? `<span class="pill p-engine">${esc(j.engine)}</span>` : ''}
-        ${hasVisa(j) ? `<span class="pill p-visa">${visaText(j)}</span>` : ''}
-        ${j.student ? `<span class="pill p-stu">Student-friendly</span>` : ''}
+      <div class="jc-meta-mini">
+        <span>${esc(cityName(j.location))}</span>
+        <span class="dot">·</span>
+        <span>${esc(j.mode||'On-site')}</span>
+        ${j.salary ? `<span class="dot">·</span><span class="jc-salary-mini">${esc(j.salary)}</span>` : ''}
       </div>
-      ${j.desc ? `<div class="jc-desc">${hl(j.desc,q)}</div>` : ''}
+      <div class="jc-date-mini">${j.posted ? relDate(j.posted) : 'Recently added'}</div>
     </div>
-    <aside class="jc-side">
-      <div class="jc-side-top">
-        <span class="signal-score"><strong>${score}</strong><span>Signal</span></span>
-        <span class="jc-salary">${esc(salary)}</span>
-        <button class="sv-btn${sv?' saved':''}" onclick="toggleSave(event,${ri})" aria-label="${sv?'Unsave':'Save'}" title="${sv?'Saved':'Save'}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="${sv?'currentColor':'none'}" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-      <div class="jc-foot-main">
-        <span class="jc-verified">Verified listing</span>
-        <span class="jc-date">${j.posted ? 'Posted '+relDate(j.posted) : ''}</span>
-      </div>
-      <div class="jc-cta-row">
-        ${applyAction}
-        <button type="button" class="btn-s compare-btn${cmp?' on':''}" onclick="toggleCompare(event,${ri})">${cmp?'Compared':'Compare'}</button>
-        <button type="button" class="btn-s" onclick="openDet(${ri},event);event.stopPropagation()">Details</button>
-      </div>
-    </aside>
   </div>`;
 }
 
@@ -4193,17 +4221,16 @@ function staleHref(j){
   const body=encodeURIComponent('This job may be expired or inaccurate.\n\nRole: '+(j.title||'')+'\nStudio: '+(j.studio||'')+'\nLocation: '+(j.location||'')+'\nApply link: '+(j.apply||'')+'\n\nNotes: ');
   return 'mailto:mapledevsbusiness@gmail.com?subject='+subject+'&body='+body;
 }
-function detailHTML(j,idx){const sv=isSaved(j),cmp=isCompared(j),score=signalScore(j);
+function detailHTML(j,idx,isInline=false){
+const sv=isSaved(j),cmp=isCompared(j),score=signalScore(j);
 const apSec=j.apply?'<div class="apply-blk"><div class="d-label" style="margin-bottom:10px">How to apply</div>'+(j.apply.startsWith("mailto:")?'<p class="d-text" style="margin-bottom:1rem">'+esc(j.apply.replace("mailto:",""))+'</p>':'<p class="d-text" style="margin-bottom:1rem"><a href="'+esc(j.apply)+'" target="_blank" rel="noopener" style="color:var(--maple)">View application page</a></p>')+'<a class="apply-btn" href="'+esc(j.apply)+'" target="_blank" rel="noopener">Apply now</a><div class="d-acts" style="margin-top:12px"><a class="d-act-btn" href="'+esc(staleHref(j))+'">Report stale listing</a></div></div>':'';
 const mobileActions='<div class="mobile-detail-actions">'+(j.apply?'<a class="mobile-apply" href="'+esc(j.apply)+'" target="_blank" rel="noopener">Apply</a>':'<button type="button" class="mobile-apply" disabled>No apply link</button>')+'<button type="button" class="'+(sv?'saved':'')+'" onclick="togSaveDet(event,'+idx+')" aria-label="'+(sv?'Unsave':'Save')+' job"><svg width="18" height="18" viewBox="0 0 24 24" fill="'+(sv?'currentColor':'none')+'" stroke="currentColor" stroke-width="2.4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg></button><button type="button" onclick="shareJob('+idx+')" aria-label="Share job"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button></div>';
-const detailFacts='<div class="jc-meta" style="margin:1rem 0 0">'+metaItem('Signal score',score+'/100')+metaItem('Location',j.location||'Canada')+metaItem('Work mode',j.mode||'Not listed')+metaItem('Salary',j.salary||'Not listed','salary')+'</div>';
-return '<div class="d-hdr"><div class="d-title">'+esc(j.title)+'</div><div class="d-studio">'+esc(j.studio)+(j.posted?' - Posted '+relDate(j.posted):'')+'</div>'
-+detailFacts
-+'<div class="d-pills" style="margin-top:12px">'+(j.type?'<span class="pill p-type">'+esc(j.type)+'</span>':'')+(j.engine?'<span class="pill p-engine">'+esc(j.engine)+'</span>':'')+(hasVisa(j)?'<span class="pill p-visa">'+visaText(j)+'</span>':'')+(j.student?'<span class="pill p-stu">Student-friendly</span>':'')+'</div>'
-+'<div class="d-acts"><button class="d-act-btn" onclick="shareJob('+idx+')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>'
-+'<button class="d-act-btn compare-btn'+(cmp?' on':'')+'" onclick="togCompareDet(event,'+idx+')">'+(cmp?'Compared':'Compare')+'</button>'
-+'<button class="d-act-btn'+(sv?' saved':'')+'" onclick="togSaveDet(event,'+idx+')">'+(sv?'Saved':'Save')+'</button></div></div>'
-+(j.desc?'<div class="d-sec"><div class="d-label">About the role</div><div class="d-text">'+esc(j.desc)+'</div></div>':'')+apSec+mobileActions;}
+const detailFacts='<div class="jc-meta" style="display:flex !important; flex-wrap:wrap !important; justify-content:center !important; gap:12px !important; margin:1.5rem auto !important; width:100% !important; max-width:500px !important;">'+metaItem('Signal score',score+'/100')+metaItem('Location',j.location||'Canada')+metaItem('Work mode',j.mode||'Not listed')+metaItem('Salary',j.salary||'Not listed','salary')+'</div>';
+
+const hdr = isInline ? `<div class="d-hdr" style="padding-top:0">${detailFacts}<div class="d-pills" style="margin-top:12px">${(j.type?'<span class="pill p-type">'+esc(j.type)+'</span>':'')+(j.engine?'<span class="pill p-engine">'+esc(j.engine)+'</span>':'')+(hasVisa(j)?'<span class="pill p-visa">'+visaText(j)+'</span>':'')+(j.student?'<span class="pill p-stu">Student-friendly</span>':'')}</div><div class="d-acts"><button class="d-act-btn" onclick="shareJob(${idx})">Share</button><button class="d-act-btn compare-btn${cmp?' on':''}" onclick="togCompareDet(event,${idx})">${cmp?'Compared':'Compare'}</button><button class="d-act-btn${sv?' saved':''}" onclick="togSaveDet(event,${idx})">${sv?'Saved':'Save'}</button></div></div>` 
+  : `<div class="d-hdr"><div class="d-title">${esc(j.title)}</div><div class="d-studio">${esc(j.studio)}${j.posted?' - Posted '+relDate(j.posted):''}</div>${detailFacts}<div class="d-pills" style="margin-top:12px">${(j.type?'<span class="pill p-type">'+esc(j.type)+'</span>':'')+(j.engine?'<span class="pill p-engine">'+esc(j.engine)+'</span>':'')+(hasVisa(j)?'<span class="pill p-visa">'+visaText(j)+'</span>':'')+(j.student?'<span class="pill p-stu">Student-friendly</span>':'')}</div><div class="d-acts"><button class="d-act-btn" onclick="shareJob(${idx})">Share</button><button class="d-act-btn compare-btn${cmp?' on':''}" onclick="togCompareDet(event,${idx})">${cmp?'Compared':'Compare'}</button><button class="d-act-btn${sv?' saved':''}" onclick="togSaveDet(event,${idx})">${sv?'Saved':'Save'}</button></div></div>`;
+
+return hdr + (j.desc?'<div class="d-sec"><div class="d-label">About the role</div><div class="d-text">'+esc(j.desc)+'</div></div>':'')+apSec+mobileActions;}
 
 function shareJob(idx){const url=location.origin+location.pathname+'#job-'+idx;navigator.clipboard.writeText(url).then(()=>toast('Link copied','')).catch(()=>toast('Couldn\'t copy',''));}
 function togSaveDet(e,idx){e.stopPropagation();const j=ALL[idx],k=jKey(j),i=saved.indexOf(k);if(i>-1){saved.splice(i,1);toast('Removed','');}else{saved.push(k);toast('Saved','');}localStorage.setItem('md_saved',JSON.stringify(saved));updBadge();const b=e.currentTarget,s=isSaved(j);b.classList.toggle('saved',s);b.innerHTML=s?'Saved':'Save';}
@@ -4218,14 +4245,16 @@ function openDet(idx, e) {
       const j = ALL[idx];
       const headerDiv = document.createElement('div');
       headerDiv.className = 'detail-header';
+      headerDiv.style.cssText = 'padding: 40px 24px 20px !important; min-height: 110px; display: flex; flex-direction: column; justify-content: center; position: relative; border-bottom: 1px solid var(--border); background: var(--bg-card);';
       headerDiv.innerHTML = `
-        <div class="d-title">${esc(j.title)}</div>
-        <div class="d-studio">${esc(j.studio)}</div>
-        <a href="${esc(j.apply)}" target="_blank" rel="noopener" class="detail-apply-btn" onclick="trackApply(event)">Apply Now</a>
+        <div class="d-title" style="font-family:'DM Serif Display',serif !important; font-size:26px !important; line-height:1.4 !important; color:var(--text-1) !important; margin:0 0 4px !important; padding-right:160px !important; display:block !important;">${esc(j.title)}</div>
+        <div class="d-studio" style="font-size:15px !important; color:var(--text-2) !important; margin:0 !important;">${esc(j.studio)}</div>
+        <a href="${esc(j.apply)}" target="_blank" rel="noopener" class="detail-apply-btn" onclick="trackApply(event)" style="position:absolute; top:50%; transform:translateY(-50%); right:1.5rem; background:var(--maple); color:#fff; padding:10px 22px; border-radius:100px; font-weight:700; font-size:14px; text-decoration:none;">Apply Now</a>
       `;
       const contentDiv = document.createElement('div');
       contentDiv.className = 'detail-scroll-content';
-      contentDiv.innerHTML = detailHTML(j, idx);
+      contentDiv.style.padding = '1.5rem 24px';
+      contentDiv.innerHTML = detailHTML(j, idx, true);
       pane.innerHTML = '';
       pane.appendChild(headerDiv);
       pane.appendChild(contentDiv);
@@ -4305,15 +4334,27 @@ function updateHubHighlights(){
 }
 
 /* ═══════ SAVED VIEW ═══════ */
-function showSaved(){history.pushState({v:'saved'},"","#saved");hideAll();document.getElementById("saved-view").classList.add("on");clearNav();document.getElementById("nav-saved").classList.add("active");renderSaved();window.scrollTo(0,0);trackView('Saved Jobs | MapleDevs');}
+function showSaved(){history.pushState({v:'saved'},"","#saved");hideAll();document.getElementById("saved-view").classList.add("on");clearNav();document.getElementById("nav-saved").classList.add("active");renderSaved();window.scrollTo(0,0);}
 
 function renderSaved(){const l=document.getElementById("sv-list"),sv=ALL.filter(j=>isSaved(j));if(!sv.length){l.innerHTML='<div class="state-msg"><span class="ic">♡</span>No saved jobs yet.<span class="sub">Click the heart on any job to save it.</span></div>';return;}l.innerHTML=sv.map((j,i)=>cardHTML(j,ALL.indexOf(j),i)).join("");}
 
 /* ═══════ NAV ═══════ */
 function clearNav(){document.querySelectorAll('.n-link').forEach(e=>e.classList.remove('active'));}
 function hideAll(){closeMobileFilters();document.body.classList.remove('detail-actions-open');document.getElementById("board-view").classList.add("off");document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));clearNav();}
-function closeAllViews(){showBoard();}
-function showBoard(){closeMobileFilters();document.body.classList.remove('detail-actions-open');history.pushState(null,"",location.pathname);document.getElementById("board-view").classList.remove("off");document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));clearNav();window.scrollTo(0,0);trackView();}
+
+function showBoard(){
+  closeMobileFilters();
+  document.body.classList.remove('detail-actions-open');
+  history.pushState(null,"",location.pathname);
+  document.getElementById("board-view").classList.remove("off");
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  clearNav();
+  window.scrollTo(0,0);
+}
+
+function closeAllViews(){
+  showBoard();
+}
 function localSiteRoot(){
   const href=location.href.replace(/\\/g,'/');
   const marker='/MapleDevs/';
@@ -4343,30 +4384,11 @@ function goAccount(e){
   goLocalPage(e,'account');
 }
 
-function showAbout(){history.pushState({v:'about'},"","#about");hideAll();document.getElementById("about-view").classList.add("on");clearNav();document.getElementById("nav-about").classList.add("active");observeAboutReveal();window.scrollTo(0,0);trackView('About | MapleDevs');}
+function showAbout(){history.pushState({v:'about'},"","#about");hideAll();document.getElementById("about-view").classList.add("on");clearNav();document.getElementById("nav-about").classList.add("active");observeAboutReveal();window.scrollTo(0,0);}
 
-function showPrivacy(){history.pushState({v:'privacy'},"","#privacy");hideAll();document.getElementById("privacy-view").classList.add("on");window.scrollTo(0,0);trackView('Privacy Policy | MapleDevs');}
+function showPrivacy(){history.pushState({v:'privacy'},"","#privacy");hideAll();document.getElementById("privacy-view").classList.add("on");window.scrollTo(0,0);}
 
-function showTerms(){history.pushState({v:'terms'},"","#terms");hideAll();document.getElementById("terms-view").classList.add("on");window.scrollTo(0,0);trackView('Terms of Use | MapleDevs');}
-
-function trackView(title) {
-  const pageTitle = title || document.title;
-  const pagePath = window.location.pathname + (window.location.hash || '');
-  if (typeof gtag === 'function') {
-    gtag('event', 'page_view', {
-      page_title: pageTitle,
-      page_location: window.location.href,
-      page_path: pagePath
-    });
-  }
-  if (window.posthog && typeof window.posthog.capture === 'function') {
-    window.posthog.capture('$pageview', {
-      $current_url: window.location.href,
-      page_title: pageTitle,
-      page_path: pagePath
-    });
-  }
-}
+function showTerms(){history.pushState({v:'terms'},"","#terms");hideAll();document.getElementById("terms-view").classList.add("on");window.scrollTo(0,0);}
 
 window.addEventListener("popstate",function(e){
   if(e.state&&e.state.idx!==undefined) openDet(e.state.idx);
@@ -4377,7 +4399,6 @@ window.addEventListener("popstate",function(e){
   else if(e.state&&e.state.v==='saved') showSaved();
   else if(e.state&&e.state.v==='studio') openStudioProfile(e.state.n);
   else showBoard();
-  trackView();
 });
 
 /* ═══════ POST A JOB MODAL ═══════ */
@@ -4442,7 +4463,7 @@ function movePlatformSectionsToAbout(){
 /* ═══════ INIT ═══════ */
 movePlatformSectionsToAbout();
 function handleHash(){const h=location.hash;if(h==='#about')showAbout();else if(h==='#privacy')showPrivacy();else if(h==='#terms')showTerms();else if(h==='#studios')showStudios();else if(h==='#saved')showSaved();else if(h.startsWith('#job-')){const i=parseInt(h.replace('#job-',''),10);if(!isNaN(i)&&ALL[i])openDet(i);}else if(h.startsWith('#studio-')){const sn=h.replace('#studio-','').replace(/-/g,' ').toLowerCase();const s=ALL.find(j=>j.studio.toLowerCase()==sn);if(s)openStudioProfile(s.studio);}}
-loadJobs().then(() => { handleHash(); trackView(); });
+loadJobs().then(() => { handleHash(); });
 </script>
 
 <!-- Sticky Feature Banner -->
