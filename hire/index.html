@@ -29,17 +29,37 @@
       <article class="tier">
         <h2>Free</h2>
         <div class="price">$0 <small>CAD</small></div>
-        <ul><li>Standard listing in the feed</li><li>Searchable through filters</li><li>Manual review before publishing</li></ul>
+        <ul>
+          <li>Standard listing in the feed</li>
+          <li>Searchable via all filters</li>
+          <li>Considered for weekly newsletter</li>
+          <li>Manual review before publishing</li>
+        </ul>
+        <button style="width:100%" class="btn" onclick="selectTier('free')">Post Free</button>
       </article>
+
       <article class="tier featured">
         <h2>Featured</h2>
         <div class="price">$29 <small>CAD</small></div>
-        <ul><li>Featured badge</li><li>Priority above free jobs</li><li>Spotlight visibility on MapleDevs</li></ul>
+        <ul>
+          <li>Highlighted listing with badge</li>
+          <li>Appears above free jobs</li>
+          <li>Priority placement & visibility</li>
+          <li>Spotlight visibility on MapleDevs</li>
+        </ul>
+        <button style="width:100%" class="btn" onclick="selectTier('featured')">Get Featured</button>
       </article>
-      <article class="tier">
+
+      <article class="tier boost">
         <h2>Hiring Boost</h2>
         <div class="price">$39 <small>CAD</small></div>
-        <ul><li>Maximum visibility placement</li><li>Strong visual highlight</li><li>Limited active slots</li></ul>
+        <ul>
+          <li>Maximum visibility placement</li>
+          <li>Strong visual highlight</li>
+          <li>Limited active slots</li>
+          <li>Priority social promotion</li>
+        </ul>
+        <button style="width:100%" class="btn" onclick="selectTier('hiring_boost')">Maximum Boost</button>
       </article>
     </section>
 
@@ -47,11 +67,11 @@
 
     <section id="post" class="panel">
       <h2>Submit a job</h2>
-      <form class="form" action="https://formsubmit.co/mapledevsbusiness@gmail.com" method="POST">
+      <form id="post-form" class="form" onsubmit="return submitPostForm(event)">
         <input type="hidden" name="_subject" value="[MapleDevs] New Job Posting Request">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="Featured Refund Policy" value="Featured placement payments are final and non-refundable once the listing is live.">
+        
         <div class="row">
           <label>Job title<input name="Job Title" required placeholder="Senior Game Designer"></label>
           <label>Studio name<input name="Studio Name" required placeholder="Your Studio"></label>
@@ -64,15 +84,74 @@
           <label>Job type<select name="Job Type" required><option value="">Select</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option></select></label>
           <label>Work mode<select name="Work Mode" required><option value="">Select</option><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label>
         </div>
-        <label>Package<select name="Tier"><option value="free">Free</option><option value="featured">Featured - $29 CAD</option><option value="hiring_boost">Hiring Boost - $39 CAD</option></select></label>
-        <label>Description<textarea name="Description" rows="6" required placeholder="Describe the role, requirements, and studio."></textarea></label>
+
+        <div style="margin-top:14px;">
+          <label>Select Package</label>
+          <div style="display:flex; gap:12px; margin-top:8px;">
+            <label style="font-weight:400;"><input type="radio" name="Tier" value="free" checked style="width:auto; margin-top:0;"> Free</label>
+            <label style="font-weight:400;"><input type="radio" name="Tier" value="featured" style="width:auto; margin-top:0;"> Featured ($29)</label>
+            <label style="font-weight:400;"><input type="radio" name="Tier" value="hiring_boost" style="width:auto; margin-top:0;"> Hiring Boost ($39)</label>
+          </div>
+        </div>
+
+        <label style="margin-top:14px;">Description<textarea name="Description" rows="6" required placeholder="Describe the role, requirements, and studio."></textarea></label>
+        
         <div class="row">
           <label>Your name<input name="Contact Name" required></label>
           <label>Your email<input type="email" name="Contact Email" required></label>
         </div>
-        <button class="btn submit" type="submit">Submit for review</button>
+
+        <div id="post-msg" class="form-msg" style="display:none; margin:16px 0;"></div>
+        <button id="post-submit-btn" class="btn submit" type="submit" style="margin-top:12px;">Submit for review</button>
       </form>
     </section>
   </main>
+
+  <script>
+    function submitPostForm(e){
+      e.preventDefault();
+      const form = document.getElementById('post-form');
+      const btn = document.getElementById('post-submit-btn');
+      const msg = document.getElementById('post-msg');
+      btn.disabled = true; btn.textContent = 'Sending...';
+      msg.style.display = 'none';
+
+      const data = new FormData(form);
+      fetch('https://formsubmit.co/ajax/mapledevsbusiness@gmail.com', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: data
+      }).then(r => r.json()).then(d => {
+        if(d.success){
+          msg.style.display = 'block';
+          const tierVal = form.querySelector('input[name="Tier"]:checked').value;
+          if (tierVal === 'free') {
+            msg.innerHTML = '<div class="success-box" style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px;text-align:left;"><b>✅ Submitted successfully!</b><p style="margin:12px 0;">Your job has been sent for manual review and will be published shortly.</p></div>';
+          } else {
+            const amt = tierVal === 'hiring_boost' ? '$39 CAD' : '$29 CAD';
+            const tName = tierVal === 'hiring_boost' ? 'Hiring Boost' : 'Featured';
+            msg.innerHTML = `<div class="success-box" style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px;text-align:left;"><b>✅ Submitted successfully!</b><p style="margin:12px 0;">To complete your job posting, please follow these steps:</p><ol style="margin:0 0 16px;padding-left:20px;"><li>Send an Interac e-Transfer to <b>wupeiheng11@gmail.com</b></li><li>Amount: <b>${amt}</b> (${tName})</li><li><b>IMPORTANT:</b> Include your job title or studio name in the message.</li></ol><p style="margin:0;font-size:0.95rem;color:var(--muted);">Once payment is received, your listing will be manually approved and published.</p></div>`;
+          }
+          form.reset();
+        } else { throw new Error(); }
+      }).catch(() => {
+        msg.style.display = 'block';
+        msg.innerHTML = '<div style="color:#c7352d; padding:16px; border:1px solid #c7352d; border-radius:8px;">⚠ Error — please email <b>mapledevsbusiness@gmail.com</b> directly.</div>';
+      }).finally(() => {
+        btn.disabled = false; btn.textContent = 'Submit for review';
+      });
+      return false;
+    }
+
+    function selectTier(val) {
+      const radio = document.querySelector(`input[name="Tier"][value="${val}"]`);
+      if (radio) radio.checked = true;
+      document.getElementById('post').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    if(window.location.hash === '#post') {
+       document.getElementById('post').scrollIntoView();
+    }
+  </script>
 </body>
 </html>

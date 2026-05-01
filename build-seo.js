@@ -68,6 +68,7 @@ function parseCSV(t) {
 
     const cl = (s) => s ? s.trim() : "";
     const hkey = (s) => cl(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const featuredValue = (s) => /^(yes|true|1|featured|hiring_boost|boost|paid)$/i.test(cl(s).replace(/\s+/g, '_'));
     const header = (rows[0] || []).map(hkey);
     const cell = (row, names, fallback) => {
         for (const name of names) {
@@ -82,7 +83,7 @@ function parseCSV(t) {
         const rw=rows[i];
         const status = cell(rw, ['status']);
         const linkStatus = cell(rw, ['link_status']);
-        const featured = cell(rw, ['feature', 'Featured', '(Featured)'], 8).toLowerCase() === "yes";
+        const featured = featuredValue(cell(rw, ['feature', 'Featured', '(Featured)', 'Tier'], 8));
         if(status && !['approved', 'live', 'active'].includes(hkey(status))) continue;
         const linkKey = hkey(linkStatus);
         if (['stale_by_date', 'outdated', 'date_expired'].includes(linkKey)) continue;
