@@ -323,6 +323,7 @@ function websiteSchema() {
 function jobPostingSchema(job, url) {
     const loc = parseLocation(job.location);
     const salary = parseSalary(job.salary);
+    const remote = isRemote(job);
     const schema = {
         '@type': 'JobPosting',
         '@id': `${url}#jobposting`,
@@ -343,8 +344,10 @@ function jobPostingSchema(job, url) {
             '@type': 'Organization',
             name: job.studio,
             logo: 'https://mapledevs.ca/og-image.png'
-        },
-        jobLocation: {
+        }
+    };
+    if (loc.region) {
+        schema.jobLocation = {
             '@type': 'Place',
             address: {
                 '@type': 'PostalAddress',
@@ -352,10 +355,10 @@ function jobPostingSchema(job, url) {
                 addressRegion: loc.region,
                 addressCountry: loc.country
             }
-        }
-    };
+        };
+    }
     if (salary) schema.baseSalary = salary;
-    if (isRemote(job)) {
+    if (remote) {
         schema.jobLocationType = 'TELECOMMUTE';
         schema.applicantLocationRequirements = { '@type': 'Country', name: 'Canada' };
     }

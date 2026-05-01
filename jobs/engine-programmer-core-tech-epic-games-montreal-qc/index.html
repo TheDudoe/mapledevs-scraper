@@ -6,11 +6,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Engine Programmer - Core Tech at Epic Games | Canadian Game Jobs - MapleDevs</title>
-<meta name="description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site). Verified Canadian game industry opportunity.">
+<meta name="description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site | C++ / Proprietary). Verified Canadian game industry opportunity.">
 <meta name="keywords" content="Canadian game jobs, game developer jobs Canada, game industry Canada, Vancouver game jobs, Montreal game studio jobs, Toronto game dev, Canadian game studios hiring" />
 <meta property="og:site_name" content="MapleDevs" />
 <meta property="og:title" content="Engine Programmer - Core Tech at Epic Games | Canadian Game Jobs - MapleDevs">
-<meta property="og:description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site). Verified Canadian game industry opportunity.">
+<meta property="og:description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site | C++ / Proprietary). Verified Canadian game industry opportunity.">
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://mapledevs.ca/jobs/engine-programmer-core-tech-epic-games-montreal-qc/">
 <meta property="og:image" content="https://mapledevs.ca/og-image.png" />
@@ -18,7 +18,7 @@
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Engine Programmer - Core Tech at Epic Games | Canadian Game Jobs - MapleDevs">
-<meta name="twitter:description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site). Verified Canadian game industry opportunity.">
+<meta name="twitter:description" content="Apply for Engine Programmer - Core Tech at Epic Games (Montreal, QC | On-site | C++ / Proprietary). Verified Canadian game industry opportunity.">
 <meta name="twitter:image" content="https://mapledevs.ca/og-image.png" />
 <meta name="theme-color" content="#C8372D" />
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -88,7 +88,7 @@
       "identifier": {
         "@type": "PropertyValue",
         "name": "Epic Games",
-        "value": "engine-programmer-core-tech-epic-games-montreal-qc"
+        "value": "engine programmer - core tech-epic games"
       },
       "hiringOrganization": {
         "@type": "Organization",
@@ -103,7 +103,8 @@
           "addressRegion": "QC",
           "addressCountry": "CA"
         }
-      }
+      },
+      "skills": "C++ / Proprietary"
     }
   ]
 }
@@ -4228,7 +4229,7 @@ select,
             </div>
             <div class="jc-studio">Epic Games</div>
             <div class="jc-meta"><div class="meta-item "><span class="meta-k">Location</span><span class="meta-v">Montreal, QC</span></div><div class="meta-item "><span class="meta-k">Work mode</span><span class="meta-v">On-site</span></div><div class="meta-item salary"><span class="meta-k">Salary</span><span class="meta-v">Not listed</span></div></div>
-            <div class="jc-pills"><span class="pill p-type">Full-time</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
+            <div class="jc-pills"><span class="pill p-type">Full-time</span><span class="pill p-engine">C++ / Proprietary</span></div><p class="jc-desc">WHAT MAKES US EPIC? At the core of Epic’s success are talented, passionate people.</p>
         </div>
         <aside class="jc-side">
             <div class="jc-side-top"><span class="signal-score"><strong>73</strong><span>Signal</span></span><span class="jc-salary">Salary not listed</span></div>
@@ -4838,7 +4839,10 @@ function updateStats(){
     }
   }
 }
-function injectJobSchema(jobs){const jld=jobs.map(j=>({"@context":"https://schema.org/","@type":"JobPosting","title":j.title,"description":j.desc||"Opportunity at "+j.studio,"datePosted":j.posted?new Date(j.posted).toISOString():new Date().toISOString(),"validThrough":new Date(Date.now()+30*24*60*60*1000).toISOString(),"employmentType":j.type?j.type.toUpperCase().replace("-","_"):"FULL_TIME","hiringOrganization":{"@type":"Organization","name":j.studio,"logo":"https://mapledevs.ca/og-image.png"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":j.location||"Canada","addressCountry":"CA"}},"jobLocationType":(j.mode||"").toLowerCase().includes("remote")?"TELECOMMUTE":undefined,"applicantLocationRequirements":(j.mode||"").toLowerCase().includes("remote")?{"@type":"Country","name":"Canada"}:undefined}));const el=document.getElementById("job-schema-dynamic");if(el)el.remove();const s=document.createElement("script");s.id="job-schema-dynamic";s.type="application/ld+json";s.text=JSON.stringify(jld);document.head.appendChild(s);}
+function injectJobSchema(){
+  const el=document.getElementById("job-schema-dynamic");
+  if(el)el.remove();
+}
 function buildTrusted(){const studios=[...new Set(ALL.map(j=>j.studio))].slice(0,12);const el=document.getElementById('trusted-logos');if(!el)return;el.innerHTML=studios.map(s=>'<span class="trusted-name">'+esc(s)+'</span>').join('');}
 
 function jobTime(j){

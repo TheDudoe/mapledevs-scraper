@@ -88,7 +88,7 @@
       "identifier": {
         "@type": "PropertyValue",
         "name": "Blackbird Interactive",
-        "value": "producer-blackbird-interactive-vancouver-bc"
+        "value": "lv_blackbirdinteractive_7c686e02_dc80_4d78_9b05_b53f6457add2"
       },
       "hiringOrganization": {
         "@type": "Organization",
@@ -4838,7 +4838,10 @@ function updateStats(){
     }
   }
 }
-function injectJobSchema(jobs){const jld=jobs.map(j=>({"@context":"https://schema.org/","@type":"JobPosting","title":j.title,"description":j.desc||"Opportunity at "+j.studio,"datePosted":j.posted?new Date(j.posted).toISOString():new Date().toISOString(),"validThrough":new Date(Date.now()+30*24*60*60*1000).toISOString(),"employmentType":j.type?j.type.toUpperCase().replace("-","_"):"FULL_TIME","hiringOrganization":{"@type":"Organization","name":j.studio,"logo":"https://mapledevs.ca/og-image.png"},"jobLocation":{"@type":"Place","address":{"@type":"PostalAddress","addressLocality":j.location||"Canada","addressCountry":"CA"}},"jobLocationType":(j.mode||"").toLowerCase().includes("remote")?"TELECOMMUTE":undefined,"applicantLocationRequirements":(j.mode||"").toLowerCase().includes("remote")?{"@type":"Country","name":"Canada"}:undefined}));const el=document.getElementById("job-schema-dynamic");if(el)el.remove();const s=document.createElement("script");s.id="job-schema-dynamic";s.type="application/ld+json";s.text=JSON.stringify(jld);document.head.appendChild(s);}
+function injectJobSchema(){
+  const el=document.getElementById("job-schema-dynamic");
+  if(el)el.remove();
+}
 function buildTrusted(){const studios=[...new Set(ALL.map(j=>j.studio))].slice(0,12);const el=document.getElementById('trusted-logos');if(!el)return;el.innerHTML=studios.map(s=>'<span class="trusted-name">'+esc(s)+'</span>').join('');}
 
 function jobTime(j){
