@@ -1,0 +1,67 @@
+name: MapleDevs Editorial Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'draft'
+        type: choice
+        options:
+          - draft
+          - publish
+      topic:
+        description: 'Topic for draft (only if action is draft)'
+        required: false
+      filename:
+        description: 'Draft filename to publish (e.g. example-post.json)'
+        required: false
+
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Generate Blog Draft
+        if: ${{ github.event.inputs.action == 'draft' }}
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: node generate-blog-draft.js "${{ github.event.inputs.topic }}"
+
+      - name: Publish Approved Blog
+        if: ${{ github.event.inputs.action == 'publish' }}
+        run: node publish-blog.js "${{ github.event.inputs.filename }}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Maple Feed: Editorial Update"
+          branch: "editorial/${{ github.run_id }}"
+          title: "Maple Feed: ${{ github.event.inputs.topic || github.event.inputs.filename }}"
+          body: |
+            ## MapleDevs Editorial Pipeline Report
+            
+            **Action:** ${{ github.event.inputs.action }}
+            **Input:** ${{ github.event.inputs.topic || github.event.inputs.filename }}
+            
+            This PR contains an update to The Maple Feed.
+            - If this was a **Draft**, review the new JSON file in `blog-drafts/`.
+            - If this was a **Publish**, review the generated HTML in `/blog/` and the updated `index.html`.
+            
+            **CRITICAL:** Please verify that all branding and links match the MapleDevs standard before merging.
+          labels: "editorial"

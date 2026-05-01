@@ -1,0 +1,38 @@
+name: MapleDevs Swarm
+
+on:
+  schedule:
+    - cron: '0 */8 * * *' # Every 8 hours
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  run-swarm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Swarm Intelligence
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+        run: node swarm_manager.js
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "MapleDevs Swarm Agent"
+          git config --global user.email "swarm@mapledevs.ca"
+          git add .
+          git commit -m "🤖 Swarm Auto-Update: Jobs & Industry News" || echo "No changes to commit"
+          git push

@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducing The Maple Feed | MapleDevs Editorial</title>
+    <meta name="description" content="Welcome to the first edition of The Maple Feed, your definitive source for Canadian game industry news and insights.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="canonical" href="https://mapledevs.ca/blog/mapledevs-editorial-launch.html">
+    <meta property="og:title" content="Introducing The Maple Feed | MapleDevs Editorial">
+    <meta property="og:description" content="Welcome to The Maple Feed, MapleDevs' editorial hub for Canadian game industry news and career insight.">
+    <meta property="og:url" content="https://mapledevs.ca/blog/mapledevs-editorial-launch.html">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --maple: #ff4d4d;
+            --maple-gradient: linear-gradient(135deg, #ff4d4d 0%, #b30000 100%);
+            --bg: #0a0b10;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --text: #e0e0e6;
+            --text-dim: #9494a3;
+            --border: rgba(255, 255, 255, 0.1);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #F8F7F4;
+            --card-bg: #FFFFFF;
+            --text: #111110;
+            --text-dim: #4A4A45;
+            --border: rgba(17, 17, 16, 0.07);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.8; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased;
+            transition: background var(--transition), color var(--transition);
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
+        
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        
+        .back-link { 
+            color: var(--maple); 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 600; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-link:hover { opacity: 0.8; }
+
+        header { 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 40px; 
+            margin-bottom: 40px; 
+        }
+        
+        h1 { 
+            font-family: 'DM Serif Display', serif;
+            font-size: 48px; 
+            color: var(--text); 
+            margin: 0 0 15px 0; 
+            letter-spacing: -1.5px; 
+            font-weight: 400;
+            line-height: 1.1;
+        }
+        
+        .metadata {
+            color: var(--text-dim);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .content { font-size: 18px; color: var(--text); }
+        .content p { margin-bottom: 28px; }
+        .content h2 { 
+            font-family: 'DM Serif Display', serif;
+            color: var(--text); 
+            margin: 50px 0 20px 0; 
+            font-size: 28px; 
+            font-weight: 400;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .theme-toggle:hover {
+            border-color: var(--maple);
+            transform: rotate(15deg);
+        }
+
+        footer { 
+            margin-top: 100px; 
+            padding-top: 40px; 
+            border-top: 1px solid var(--border); 
+            color: var(--text-dim); 
+            font-size: 13px; 
+            text-align: center; 
+        }
+        /* Professional Maple Feed article refresh */
+        :root {
+            --maple: #d83b2e;
+            --maple-gradient: linear-gradient(135deg, #d83b2e 0%, #f05a47 100%);
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #12151b;
+            --text-dim: #647080;
+            --border: rgba(18, 21, 27, 0.12);
+        }
+        [data-theme="dark"] {
+            --bg: #101318;
+            --card-bg: #171b22;
+            --text: #f5f7fb;
+            --text-dim: #9ca7b7;
+            --border: rgba(255, 255, 255, 0.12);
+        }
+        body {
+            background: linear-gradient(135deg, rgba(216, 59, 46, 0.08), transparent 34%), var(--bg);
+            letter-spacing: 0;
+        }
+        .container { max-width: 980px; padding: 40px 24px 72px; }
+        .nav-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            margin-bottom: 44px;
+            padding: 12px 0;
+            background: color-mix(in srgb, var(--bg) 88%, transparent);
+            backdrop-filter: blur(16px);
+        }
+        .back-link {
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+        .back-link:hover { color: var(--maple); opacity: 1; }
+        header { max-width: 860px; margin-bottom: 36px; padding-bottom: 24px; }
+        h1, .content h2 { font-family: 'Inter', sans-serif; letter-spacing: 0; }
+        h1 { font-size: clamp(2.25rem, 5vw, 4.7rem); line-height: 1; font-weight: 850; }
+        .content {
+            max-width: 800px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: clamp(24px, 4vw, 48px);
+            box-shadow: 0 14px 38px rgba(18, 21, 27, 0.08);
+        }
+        .content h2 { font-weight: 800; line-height: 1.15; }
+        .content p, .content li { color: color-mix(in srgb, var(--text) 84%, var(--text-dim)); }
+        .theme-toggle { border-radius: 6px; }
+        @media (max-width: 640px) {
+            .container { padding: 28px 16px 56px; }
+            .content { padding: 22px; }
+        }
+    </style>
+    <script>
+      (function(h,o,u,n,d) {
+        h[d] = h[d] || { q: [], onReady: function (c) { h.q.push(c) } }
+        d = o.createElement(u); d.async = 1; d.src = n; d.crossOrigin='anonymous'
+        n = o.getElementsByTagName(u)[0]; n.parentNode.insertBefore(d, n)
+      })(window, document, 'script', 'https://www.datadoghq-browser-agent.com/us5/v6/datadog-rum.js', 'DD_RUM')
+      window.DD_RUM.onReady(function () {
+        window.DD_RUM.init({
+          clientToken: 'pub4e371293c377f9ebb8d29cf402719cc4',
+          applicationId: 'fac714c5-9145-479b-8e8b-9b5200e4a5a1',
+          site: 'us5.datadoghq.com',
+          service: 'mapledevs-web',
+          env: 'prod',
+          version: '1.0.0',
+          sessionSamplerRate: 100,
+          sessionReplaySamplerRate: 100,
+          trackResources: true,
+          trackLongTasks: true,
+          trackUserInteractions: true,
+        })
+      })
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-header">
+            <a href="/blog/index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to Feed
+            </a>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+                    <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></svg>
+                </button>
+                <img src="/favicon.png" alt="MapleDevs" style="height: 24px; opacity: 0.5;">
+            </div>
+        </div>
+
+        <header>
+            <h1>Introducing The Maple Feed</h1>
+            <div class="metadata">
+                <span>MapleDevs Editorial</span>
+                <span>•</span>
+                <span>April 22, 2026</span>
+            </div>
+        </header>
+
+        <article class="content">
+            <p>Welcome to the first edition of <strong>The Maple Feed</strong>. This is more than just a blog, it’s a commitment to the Canadian game development community. Every week, our editorial team will bring you the most important news from studios across the country, from the bustling hubs of Montreal and Vancouver to the rising scenes in Alberta and the Maritimes.</p>
+            
+            <h2>Our Mission</h2>
+            <p>We built MapleDevs to cut through the noise of US-centric job boards. The Maple Feed is the next step in that journey. We want to provide you with the context you need to build your career in Canada, whether you’re a junior looking for your first role or a lead developer navigating the changing landscape of major studio acquisitions.</p>
+            
+            <h2>What to Expect</h2>
+            <p>Moving forward, you can expect weekly roundup articles, deep dives into studio culture, and tips for landing roles in the Canadian market. Everything is curated to be relevant to you, the developer working in the Great White North.</p>
+        </article>
+
+        <footer>
+            &copy; 2026 MapleDevs. Verified Industry Insights.
+        </footer>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        const sunIcon = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+        const moonIcon = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('maple-theme', theme);
+            themeIcon.innerHTML = theme === 'light' ? moonIcon : sunIcon;
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('maple-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    </script>
+</body>
+</html>

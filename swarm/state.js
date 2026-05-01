@@ -1,0 +1,47 @@
+window.SWARM_STATE = {
+  "last_run": "2026-04-22T03:56:48.533Z",
+  "status": "error",
+  "active_agents": [
+    "scout"
+  ],
+  "queue": [],
+  "history": [],
+  "stats": {
+    "jobs_processed": 0,
+    "jobs_approved": 0,
+    "blogs_written": 1
+  },
+  "agents": {
+    "scout": {
+      "status": "Idle",
+      "last_action": "Error: MISSING_API_KEY: Please set GOOGLE_API_KEY in your .env file.",
+      "project": "Gaming News & Jobs",
+      "last_run": "2026-04-30T20:17:19.954Z"
+    },
+    "reviewer": {
+      "status": "Idle",
+      "last_action": "Skipping: Google credentials missing.",
+      "project": "Sheet Gatekeeper",
+      "last_run": "2026-04-22T05:10:22.627Z"
+    },
+    "author": {
+      "status": "Idle",
+      "last_action": "Error: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent: [429 Too Many Requests] You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.5-pro\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.5-pro\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.5-pro\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.5-pro\nPlease retry in 35.338952334s. [{\"@type\":\"type.googleapis.com/google.rpc.Help\",\"links\":[{\"description\":\"Learn more about Gemini API quotas\",\"url\":\"https://ai.google.dev/gemini-api/docs/rate-limits\"}]},{\"@type\":\"type.googleapis.com/google.rpc.QuotaFailure\",\"violations\":[{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_input_token_count\",\"quotaId\":\"GenerateContentInputTokensPerModelPerDay-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-pro\"}},{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerDayPerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-pro\",\"location\":\"global\"}},{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\"quotaId\":\"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\"quotaDimensions\":{\"location\":\"global\",\"model\":\"gemini-2.5-pro\"}},{\"quotaMetric\":\"generativelanguage.googleapis.com/generate_content_free_tier_input_token_count\",\"quotaId\":\"GenerateContentInputTokensPerModelPerMinute-FreeTier\",\"quotaDimensions\":{\"model\":\"gemini-2.5-pro\",\"location\":\"global\"}}]},{\"@type\":\"type.googleapis.com/google.rpc.RetryInfo\",\"retryDelay\":\"35s\"}]",
+      "project": "Content Creation",
+      "last_run": "2026-04-22T05:10:23.284Z"
+    },
+    "optimizer": {
+      "status": "Idle",
+      "last_action": "Optimization complete. Slug: canadian-gaming-industry-news-opportunities",
+      "project": "SEO Magic",
+      "last_run": "2026-04-22T03:56:48.526Z"
+    },
+    "director": {
+      "status": "Idle",
+      "last_action": "All systems synchronized.",
+      "project": "Publishing",
+      "last_run": "2026-04-22T03:56:48.535Z"
+    }
+  },
+  "last_error": "MISSING_API_KEY: Please set GOOGLE_API_KEY in your .env file."
+};

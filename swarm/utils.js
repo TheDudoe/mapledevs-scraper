@@ -1,0 +1,124 @@
+const fs = require('fs-extra');
+const path = require('path');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
+
+// Configuration
+const STATE_PATH = path.join(__dirname, 'state.json');
+
+/**
+ * Update the global swarm state
+ */
+async function updateState(newState) {
+    const statePath = path.join(__dirname, 'state.json');
+    const stateJsPath = path.join(__dirname, 'state.js');
+    
+    let currentState = {};
+    if (await fs.pathExists(statePath)) {
+        currentState = await fs.readJson(statePath);
+    }
+    
+    const mergedState = { ...currentState, ...newState };
+    await fs.writeJson(statePath, mergedState, { spaces: 2 });
+    
+    // Also write as a JS file for local browser compatibility (bypasses CORS)
+    const jsContent = `window.SWARM_STATE = ${JSON.stringify(mergedState, null, 2)};`;
+    await fs.writeFile(stateJsPath, jsContent);
+}
+
+/**
+ * Updates a specific agent's status and last action
+ */
+async function updateAgent(id, status, lastAction) {
+    const state = await fs.readJson(STATE_PATH);
+    if (state.agents[id]) {
+        state.agents[id].status = status;
+        state.agents[id].last_action = lastAction;
+        state.agents[id].last_run = new Date().toISOString();
+        await fs.writeJson(STATE_PATH, state, { spaces: 2 });
+    }
+}
+
+/**
+ * Initialize Gemini
+ */
+function getGemini(modelName = 'gemini-2.0-flash') {
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        throw new Error('MISSING_API_KEY: Please set GOOGLE_API_KEY in your .env file.');
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    return genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
+}
+
+/**
+ * Generic AI call with retry and fallback logic
+ */
+async function askAI(agentName, prompt, model = 'gemini-2.0-flash') {
+    const modelsToTry = [model, 'gemini-2.5-flash', 'gemini-pro-latest', 'gemini-2.0-flash-001'];
+    let lastError;
+
+    for (const modelName of modelsToTry) {
+        try {
+            const genModel = getGemini(modelName);
+            const result = await genModel.generateContent(prompt);
+            return result.response.text();
+        } catch (error) {
+            console.error(`[AI Error] ${modelName}:`, error.message);
+            lastError = error;
+            if (error.message.includes('API key expired') || error.message.includes('API_KEY_INVALID')) {
+                throw error;
+            }
+        }
+    }
+
+    throw lastError;
+}
+
+/**
+ * Google Sheets Authentication
+ */
+async function getSheets() {
+    const { google } = require('googleapis');
+    const credsPath = path.join(__dirname, '../credentials.json');
+    
+    let auth;
+    if (await fs.pathExists(credsPath)) {
+        auth = new google.auth.GoogleAuth({
+            keyFile: credsPath,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+    } else {
+        const rawCreds = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_PRIVATE_KEY || process.env.GOOGLE_INDEXING_KEY;
+        const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+
+        if (!rawCreds) throw new Error('MISSING_GOOGLE_CREDS: Please set GOOGLE_SERVICE_ACCOUNT_JSON.');
+
+        let credentials;
+        try {
+            credentials = JSON.parse(rawCreds.trim());
+        } catch (e) {
+            const privateKey = rawCreds.includes('BEGIN PRIVATE KEY')
+                ? rawCreds.replace(/\\n/g, '\n')
+                : rawCreds;
+            credentials = {
+                client_email: clientEmail,
+                private_key: privateKey,
+            };
+        }
+
+        auth = new google.auth.GoogleAuth({
+            credentials,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+    }
+
+    return google.sheets({ version: 'v4', auth });
+}
+
+module.exports = {
+    updateState,
+    updateAgent,
+    askAI,
+    getSheets
+};

@@ -867,6 +867,12 @@ const PIPELINE_SHEETS = {
   live: 'jobs_live',
 };
 
+const PIPELINE_RANGE = 'A:AZ';
+const AUTO_APPROVE_SAFE_JOBS = process.env.AUTO_APPROVE_SAFE_JOBS !== 'false';
+const AUTO_APPROVE_SCORE = Number(process.env.AUTO_APPROVE_SCORE || 80);
+const JOB_MAX_AGE_DAYS = Number(process.env.JOB_MAX_AGE_DAYS || 90);
+const STALE_BY_DATE_STATUS = 'stale_by_date';
+
 const PIPELINE_HEADERS = [
   'job_id',
   'Job Title',
@@ -887,7 +893,16 @@ const PIPELINE_HEADERS = [
   'first_seen_at',
   'last_seen_at',
   'last_verified_at',
+  'source_url',
   'source_id',
+  'scraped_at',
+  'notes',
+  'date_reviewed',
+  'tags',
+  'review_score',
+  'review_recommendation',
+  'review_reason',
+  'auto_reviewed_at',
 ];
 
 function normalizeKey(value) {
@@ -938,7 +953,12 @@ function jobToRecord(job, now) {
     first_seen_at: now,
     last_seen_at: now,
     last_verified_at: now,
+    source_url: job.applyUrl || '',
     source_id: job.sourceId || '',
+    scraped_at: now,
+    notes: '',
+    date_reviewed: '',
+    tags: '',
   };
 }
 
@@ -955,7 +975,9 @@ function objectToRow(record, headers) {
     title: 'job_title',
     studio: 'studio_name',
     apply_url: 'how_to_apply',
+    source_url: 'how_to_apply',
     posted: 'date_posted',
+    feature: 'featured',
     student: 'student_friendly',
     visa: 'visa_sponsorship',
   };
@@ -963,6 +985,167 @@ function objectToRow(record, headers) {
     const key = normalizeKey(header);
     return record[key] || record[aliases[key]] || '';
   });
+}
+
+function isYes(value) {
+  return ['yes', 'true', '1'].includes(String(value || '').trim().toLowerCase());
+}
+
+function parseJobDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+
+  const match = raw.match(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/);
+  if (match) {
+    const iso = new Date(`${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}T00:00:00Z`);
+    if (!Number.isNaN(iso.getTime())) return iso;
+  }
+
+  return null;
+}
+
+function jobAgeDays(record, now) {
+  const posted = parseJobDate(record.date_posted);
+  if (!posted) return null;
+  const reference = parseJobDate(now) || new Date();
+  return Math.floor((reference.getTime() - posted.getTime()) / 86400000);
+}
+
+function isOutdatedRecord(record, now) {
+  const age = jobAgeDays(record, now);
+  return age !== null && age > JOB_MAX_AGE_DAYS;
+}
+
+function outdatedReason(record, now) {
+  const age = jobAgeDays(record, now);
+  if (age === null) return '';
+  return `Outdated by date: posted ${age} days ago. Current limit is ${JOB_MAX_AGE_DAYS} days.`;
+}
+
+function markOutdated(record, now) {
+  const reason = outdatedReason(record, now);
+  return {
+    ...record,
+    status: 'expired',
+    link_status: STALE_BY_DATE_STATUS,
+    last_verified_at: now,
+    notes: record.notes ? `${record.notes} | ${reason}` : reason,
+    tags: mergeTags(record.tags, [STALE_BY_DATE_STATUS]),
+  };
+}
+
+function mergeTags(existing, additions) {
+  const tags = new Set(String(existing || '').split(',').map(t => t.trim()).filter(Boolean));
+  additions.forEach(tag => tags.add(tag));
+  return Array.from(tags).join(', ');
+}
+
+function hasOfficialSource(record) {
+  const source = `${record.source_id || ''} ${record.job_id || ''}`;
+  return /\b(gh|lv|sr|as|wd)_/i.test(source);
+}
+
+function hasRealApplyTarget(record) {
+  const apply = String(record.how_to_apply || record.source_url || '').trim();
+  return /^https?:\/\//i.test(apply) || /^mailto:/i.test(apply);
+}
+
+function isGeneralApplication(record) {
+  const text = `${record.job_title || ''} ${record.description || ''}`.toLowerCase();
+  return /general application|spontaneous application|candidature spontan|future opportunit|talent community|expression of interest/.test(text);
+}
+
+function isProbablyCanadian(record) {
+  const location = String(record.location || '').toLowerCase();
+  if (!location) return false;
+  if (location === 'remote') return true;
+  const canadaRegex = new RegExp(`\\b(${CANADA_KEYWORDS.join('|')})\\b`, 'i');
+  return canadaRegex.test(location) || /\b(on|qc|bc|ab|sk|mb|ns|nb|pe|nl|yt|nt|nu)\b/i.test(location);
+}
+
+function triageReviewRecord(record, now) {
+  const reasons = [];
+  const blockers = [];
+  const tags = [];
+  let score = 0;
+
+  if (hasOfficialSource(record)) { score += 25; tags.push('official_ats'); }
+  else reasons.push('No official ATS source id');
+
+  if (record.studio_name) score += 10;
+  else blockers.push('Missing studio');
+
+  if (record.job_title) score += 10;
+  else blockers.push('Missing title');
+
+  if (hasRealApplyTarget(record)) { score += 20; tags.push('apply_link'); }
+  else blockers.push('Missing application link');
+
+  if (isProbablyCanadian(record)) { score += 15; tags.push('canadian_location'); }
+  else blockers.push('Location is not clearly Canadian');
+
+  if (String(record.description || '').length >= 80) score += 10;
+  else reasons.push('Short or missing description');
+
+  if (record.salary) { score += 3; tags.push('salary_listed'); }
+  if (record.engine) { score += 3; tags.push('engine_tagged'); }
+  if (isYes(record.student_friendly)) { score += 2; tags.push('student_friendly'); }
+  if (record.visa_sponsorship) { score += 2; tags.push('visa_signal'); }
+
+  if (isGeneralApplication(record)) blockers.push('General application / talent pool');
+  if (isOutdatedRecord(record, now)) blockers.push(outdatedReason(record, now));
+
+  const linkStatus = normalizeKey(record.link_status);
+  if (['expired', 'dead', 'missing_from_source', 'inactive', STALE_BY_DATE_STATUS].includes(linkStatus)) {
+    blockers.push(`Link status is ${record.link_status}`);
+  }
+
+  const safeToAutoApprove = AUTO_APPROVE_SAFE_JOBS && blockers.length === 0 && score >= AUTO_APPROVE_SCORE;
+  const reviewReason = blockers.length
+    ? `Needs review: ${blockers.join('; ')}${reasons.length ? `. Notes: ${reasons.join('; ')}` : ''}`
+    : reasons.length
+      ? `Auto-check passed with notes: ${reasons.join('; ')}`
+      : 'Auto-check passed: official source, Canadian location, and application link present';
+
+  return {
+    status: safeToAutoApprove ? 'approved' : 'needs_review',
+    review_score: String(Math.min(100, score)),
+    review_recommendation: safeToAutoApprove ? 'auto_approve' : 'manual_review',
+    review_reason: reviewReason,
+    auto_reviewed_at: safeToAutoApprove ? now : '',
+    date_reviewed: safeToAutoApprove ? now : '',
+    tags,
+  };
+}
+
+function applyTriage(record, triage) {
+  const next = {
+    ...record,
+    status: triage.status,
+    review_score: triage.review_score,
+    review_recommendation: triage.review_recommendation,
+    review_reason: triage.review_reason,
+    tags: mergeTags(record.tags, triage.tags.concat(triage.review_recommendation)),
+  };
+
+  if (!record.notes || /^Auto-(approved|triage)|^Needs review:/i.test(record.notes)) {
+    next.notes = triage.review_reason;
+  }
+  if (triage.date_reviewed) next.date_reviewed = triage.date_reviewed;
+  if (triage.auto_reviewed_at) next.auto_reviewed_at = triage.auto_reviewed_at;
+  return next;
+}
+
+function mergeOwnerControlledFields(baseRecord, ownerRecord) {
+  if (!ownerRecord) return baseRecord;
+  const next = { ...baseRecord };
+  for (const key of ['featured']) {
+    if (ownerRecord[key]) next[key] = ownerRecord[key];
+  }
+  return next;
 }
 
 async function ensureSheet(sheets, spreadsheetId, title) {
@@ -981,7 +1164,7 @@ async function readPipelineSheet(sheets, spreadsheetId, title) {
   await ensureSheet(sheets, spreadsheetId, title);
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${title}!A:Z`,
+    range: `${title}!${PIPELINE_RANGE}`,
   });
 
   let rows = response.data.values || [];
@@ -1035,7 +1218,7 @@ async function appendPipelineRows(sheets, spreadsheetId, sheetName, rows) {
   if (!rows.length) return;
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${sheetName}!A:Z`,
+    range: `${sheetName}!${PIPELINE_RANGE}`,
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
     resource: { values: rows },
@@ -1064,32 +1247,64 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   const scrapedIds = new Set(records.map(r => r.job_id));
   const rawRowsToAppend = [];
   const reviewRowsToAppend = [];
+  const liveRowsToAppend = [];
   let rawUpdated = 0;
   let rawExpired = 0;
   let promoted = 0;
   let liveExpired = 0;
+  let dateExpired = 0;
+  let newAutoApproved = 0;
+  let existingAutoApproved = 0;
+  let reviewTriaged = 0;
+  let liveDisabledByReview = 0;
+  const disabledLiveIds = new Set();
 
   for (const record of records) {
+    const recordForPipeline = isOutdatedRecord(record, now) ? markOutdated(record, now) : record;
     const existingRaw = rawIndex.get(record.job_id);
     if (existingRaw) {
-      await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.raw, existingRaw.rowNumber, objectToRow({
+      const rawRecord = recordForPipeline.link_status === STALE_BY_DATE_STATUS ? {
         ...existingRaw.object,
-        ...record,
+        ...recordForPipeline,
+        first_seen_at: existingRaw.object.first_seen_at || recordForPipeline.first_seen_at,
+      } : {
+        ...existingRaw.object,
+        ...recordForPipeline,
         status: existingRaw.object.status === 'expired' ? 'active' : (existingRaw.object.status || 'active'),
-        first_seen_at: existingRaw.object.first_seen_at || record.first_seen_at,
-      }, rawSheet.headers));
+        first_seen_at: existingRaw.object.first_seen_at || recordForPipeline.first_seen_at,
+      };
+      await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.raw, existingRaw.rowNumber, objectToRow(rawRecord, rawSheet.headers));
       rawUpdated++;
     } else {
-      rawRowsToAppend.push(objectToRow(record, rawSheet.headers));
+      rawRowsToAppend.push(objectToRow(recordForPipeline, rawSheet.headers));
     }
 
     if (!reviewIndex.has(record.job_id) && !liveIndex.has(record.job_id)) {
-      reviewRowsToAppend.push(objectToRow({ ...record, status: 'needs_review' }, reviewSheet.headers));
+      const triage = triageReviewRecord(recordForPipeline, now);
+      const reviewRecord = recordForPipeline.link_status === STALE_BY_DATE_STATUS
+        ? recordForPipeline
+        : applyTriage(recordForPipeline, triage);
+      reviewRowsToAppend.push(objectToRow(reviewRecord, reviewSheet.headers));
+
+      if (triage.status === 'approved') {
+        liveRowsToAppend.push(objectToRow({
+          ...reviewRecord,
+          status: 'approved',
+          link_status: 'active',
+          first_seen_at: reviewRecord.first_seen_at || now,
+          last_seen_at: now,
+          last_verified_at: now,
+        }, liveSheet.headers));
+        newAutoApproved++;
+        promoted++;
+      }
+      if (recordForPipeline.link_status === STALE_BY_DATE_STATUS) dateExpired++;
     }
   }
 
   await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.raw, rawRowsToAppend);
   await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.review, reviewRowsToAppend);
+  await appendPipelineRows(sheets, sheetId, PIPELINE_SHEETS.live, liveRowsToAppend);
 
   for (const [jobId, existingRaw] of rawIndex.entries()) {
     if (scrapedIds.has(jobId)) continue;
@@ -1102,19 +1317,73 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
     rawExpired++;
   }
 
+  for (const [jobId, reviewEntry] of reviewIndex.entries()) {
+    const status = normalizeKey(reviewEntry.object.status);
+    if (!['', 'new', 'needs_review'].includes(status)) continue;
+
+    const sourceRecord = records.find(r => r.job_id === jobId) || rawIndex.get(jobId)?.object || reviewEntry.object;
+    const candidateRecord = {
+      ...sourceRecord,
+      ...reviewEntry.object,
+      job_id: jobId,
+    };
+    const triage = triageReviewRecord(candidateRecord, now);
+    const triagedRecord = isOutdatedRecord(candidateRecord, now)
+      ? markOutdated(candidateRecord, now)
+      : applyTriage(candidateRecord, triage);
+
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.review, reviewEntry.rowNumber, objectToRow(triagedRecord, reviewSheet.headers));
+    reviewEntry.object = triagedRecord;
+    reviewTriaged++;
+    if (triage.status === 'approved') existingAutoApproved++;
+    if (triagedRecord.link_status === STALE_BY_DATE_STATUS) dateExpired++;
+  }
+
+  for (const [jobId, reviewEntry] of reviewIndex.entries()) {
+    const status = normalizeKey(reviewEntry.object.status);
+    if (!['rejected', 'inactive', 'expired'].includes(status)) continue;
+    const existingLive = liveIndex.get(jobId);
+    if (!existingLive) continue;
+
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
+      ...existingLive.object,
+      status,
+      link_status: reviewEntry.object.link_status || (status === 'rejected' ? 'inactive' : status),
+      last_verified_at: now,
+      notes: reviewEntry.object.notes || existingLive.object.notes || `Disabled from review: ${status}`,
+    }, liveSheet.headers));
+    disabledLiveIds.add(jobId);
+    liveDisabledByReview++;
+  }
+
   for (const [, reviewEntry] of reviewIndex.entries()) {
     if (normalizeKey(reviewEntry.object.status) !== 'approved') continue;
     const jobId = reviewEntry.object.job_id;
     const sourceRecord = records.find(r => r.job_id === jobId) || reviewEntry.object;
+    const existingLiveRecord = liveIndex.get(jobId)?.object;
+    const isFeatured = isYes(reviewEntry.object.featured) || isYes(existingLiveRecord?.featured);
     const liveRecord = {
-      ...sourceRecord,
+      ...mergeOwnerControlledFields(sourceRecord, existingLiveRecord),
       ...reviewEntry.object,
       status: 'approved',
-      link_status: scrapedIds.has(jobId) ? 'active' : (reviewEntry.object.link_status || 'active'),
+      link_status: isFeatured || scrapedIds.has(jobId) ? 'active' : (reviewEntry.object.link_status || 'active'),
       last_seen_at: scrapedIds.has(jobId) ? now : (reviewEntry.object.last_seen_at || now),
       last_verified_at: now,
     };
     const existingLive = liveIndex.get(jobId);
+    if (isOutdatedRecord(liveRecord, now)) {
+      if (existingLive) {
+        await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow(markOutdated({
+          ...existingLive.object,
+          ...liveRecord,
+          first_seen_at: existingLive.object.first_seen_at || liveRecord.first_seen_at,
+        }, now), liveSheet.headers));
+        disabledLiveIds.add(jobId);
+        liveExpired++;
+        dateExpired++;
+      }
+      continue;
+    }
     if (existingLive) {
       await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, existingLive.rowNumber, objectToRow({
         ...existingLive.object,
@@ -1129,13 +1398,23 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
 
   for (const [jobId, liveEntry] of liveIndex.entries()) {
     if (scrapedIds.has(jobId)) continue;
+    if (isYes(liveEntry.object.featured)) continue;
     await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, liveEntry.rowNumber, objectToRow({
       ...liveEntry.object,
       status: 'expired',
       link_status: 'missing_from_source',
       last_verified_at: now,
     }, liveSheet.headers));
+    disabledLiveIds.add(jobId);
     liveExpired++;
+  }
+
+  for (const [jobId, liveEntry] of liveIndex.entries()) {
+    if (disabledLiveIds.has(jobId)) continue;
+    if (!isOutdatedRecord(liveEntry.object, now)) continue;
+    await updatePipelineRow(sheets, sheetId, PIPELINE_SHEETS.live, liveEntry.rowNumber, objectToRow(markOutdated(liveEntry.object, now), liveSheet.headers));
+    liveExpired++;
+    dateExpired++;
   }
 
   console.log(`   Scraped unique jobs: ${records.length}`);
@@ -1143,8 +1422,13 @@ async function updatePipelineSheets(sheets, sheetId, scrapedJobs) {
   console.log(`   jobs_raw updated: ${rawUpdated}`);
   console.log(`   jobs_raw expired: ${rawExpired}`);
   console.log(`   jobs_review new rows: ${reviewRowsToAppend.length}`);
+  console.log(`   jobs_review auto-approved new rows: ${newAutoApproved}`);
+  console.log(`   jobs_review existing rows triaged: ${reviewTriaged}`);
+  console.log(`   jobs_review existing rows auto-approved: ${existingAutoApproved}`);
+  console.log(`   jobs_live disabled by review decisions: ${liveDisabledByReview}`);
   console.log(`   jobs_live promoted/updated: ${promoted}`);
   console.log(`   jobs_live expired: ${liveExpired}`);
+  console.log(`   jobs expired by date limit (${JOB_MAX_AGE_DAYS} days): ${dateExpired}`);
   console.log('\nGoogle Sheet pipeline updated successfully.');
 }
 

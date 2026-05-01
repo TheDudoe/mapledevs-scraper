@@ -1,0 +1,95 @@
+[
+  {
+    "title": "Learn Unreal Engine",
+    "description": "Learn Unreal Engine with structured courses used by AAA studios. Go from beginner to advanced with real project-based training.",
+    "link": "https://dev.epicgames.com/community/unreal-engine/learning",
+    "category": "Featured",
+    "buttonText": "Start Learning Unreal",
+    "icon": "🎮",
+    "tags": ["Official", "Used by AAA studios"]
+  },
+  {
+    "title": "GameDev.tv Courses",
+    "description": "Highly rated game development courses covering C++, C#, Unity, Unreal, and Blender. Perfect for building real portfolio projects.",
+    "link": "https://www.gamedev.tv/",
+    "category": "Featured",
+    "buttonText": "Browse Courses",
+    "icon": "🎓",
+    "tags": ["Popular", "Course"]
+  },
+  {
+    "title": "Unity Learn",
+    "description": "Master Unity with guided learning paths designed for indie and professional game developers.",
+    "link": "https://learn.unity.com/",
+    "category": "Featured",
+    "buttonText": "Start Learning Unity",
+    "icon": "🕹️",
+    "tags": ["Official", "Beginner Friendly"]
+  },
+  {
+    "title": "Quixel Megascans",
+    "description": "Speed up development with high-quality assets used by indie and professional developers.",
+    "link": "https://quixel.com/megascans/",
+    "category": "Tools",
+    "buttonText": "Browse Assets",
+    "icon": "🧱",
+    "tags": ["Free", "Assets"]
+  },
+  {
+    "title": "ArtStation",
+    "description": "Build a portfolio that stands out to studios and increases your chances of getting hired.",
+    "link": "https://www.artstation.com/",
+    "category": "Tools",
+    "buttonText": "Build Your Portfolio",
+    "icon": "🖼️",
+    "tags": ["Free", "Portfolio"]
+  },
+  {
+    "title": "GitHub for Gamedev",
+    "description": "Platforms used by developers to continuously improve their skills and stay competitive.",
+    "link": "https://github.com/",
+    "category": "Tools",
+    "buttonText": "Explore Platforms",
+    "icon": "🐙",
+    "tags": ["Free", "DevOps"]
+  },
+  {
+    "id": "resume",
+    "title": "Game Industry Resume Guide",
+    "description": "Learn how to structure your resume with expert tips to stand out in the game industry.",
+    "link": "#",
+    "category": "Career",
+    "buttonText": "Read Resume Guide",
+    "icon": "📄",
+    "tags": ["New", "Guide"]
+  },
+  {
+    "id": "portfolio",
+    "title": "Portfolio Review Checklist",
+    "description": "Learn what studios actually look for and how to present your work effectively.",
+    "link": "#",
+    "category": "Career",
+    "buttonText": "View Checklist",
+    "icon": "✅",
+    "tags": ["Guide"]
+  },
+  {
+    "id": "interview",
+    "title": "Interview Prep Kit",
+    "description": "Prepare for technical and behavioral interviews with resources used by game developers.",
+    "link": "#",
+    "category": "Career",
+    "buttonText": "Prepare for Interviews",
+    "icon": "🎤",
+    "tags": ["New", "Guide"]
+  },
+  {
+    "title": "Canadian Gamedev Discord",
+    "description": "Join our community of developers in Canada. Network, share work, and find opportunities.",
+    "link": "https://discord.com/invite/TXGyQYRYg9",
+    "category": "Tools",
+    "buttonText": "Join Discord",
+    "icon": "🍁",
+    "tags": ["Community", "Free"]
+  }
+]
