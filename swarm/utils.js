@@ -45,7 +45,7 @@ async function updateAgent(id, status, lastAction) {
 function getGemini(modelName = 'gemini-2.0-flash') {
     const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        throw new Error('MISSING_API_KEY: Please set GOOGLE_API_KEY in your .env file.');
+        throw new Error('MISSING_API_KEY: Please set GOOGLE_API_KEY or GEMINI_API_KEY in your .env file.');
     }
     const genAI = new GoogleGenerativeAI(apiKey);
     return genAI.getGenerativeModel({ model: modelName }, { apiVersion: 'v1' });
@@ -81,7 +81,7 @@ async function askAI(agentName, prompt, model = 'gemini-2.0-flash') {
 async function getSheets() {
     const { google } = require('googleapis');
     const credsPath = path.join(__dirname, '../credentials.json');
-    
+
     let auth;
     if (await fs.pathExists(credsPath)) {
         auth = new google.auth.GoogleAuth({
@@ -92,7 +92,9 @@ async function getSheets() {
         const rawCreds = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_PRIVATE_KEY || process.env.GOOGLE_INDEXING_KEY;
         const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
-        if (!rawCreds) throw new Error('MISSING_GOOGLE_CREDS: Please set GOOGLE_SERVICE_ACCOUNT_JSON.');
+        if (!rawCreds) {
+            throw new Error('MISSING_GOOGLE_CREDS: Please set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_PRIVATE_KEY in your environment variables.');
+        }
 
         let credentials;
         try {
@@ -105,6 +107,10 @@ async function getSheets() {
                 client_email: clientEmail,
                 private_key: privateKey,
             };
+        }
+
+        if (!credentials.client_email && !clientEmail) {
+            throw new Error('MISSING_CLIENT_EMAIL: Please set GOOGLE_SERVICE_ACCOUNT_EMAIL in your environment variables.');
         }
 
         auth = new google.auth.GoogleAuth({
